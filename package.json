@@ -1,9 +1,9 @@
 {
-  "name": "paperback-omegascans",
+  "name": "paperback-manga-sources",
   "version": "1.0.0",
   "private": true,
-  "repositoryName": "OmegaScans Paperback Repository",
-  "description": "Paperback v0.8 source extension for Omega Scans.",
+  "repositoryName": "Paperback Manga Sources",
+  "description": "Paperback v0.8 source repository for multiple manga scan sites.",
   "scripts": {
     "typecheck": "tsc --noEmit",
     "build": "paperback bundle",
@@ -13,7 +13,8 @@
   "keywords": [
     "paperback",
     "paperback-extension",
-    "omegascans"
+    "omegascans",
+    "mangadistrict"
   ],
   "license": "MIT",
   "dependencies": {

@@ -1,6 +1,6 @@
 {
-  "name": "OmegaScans Paperback Repository",
-  "description": "Repository metadata for the Omega Scans Paperback v0.8 source.",
+  "name": "Paperback Manga Sources",
+  "description": "Repository metadata for Paperback v0.8 manga sources.",
   "version": "1.0.0",
   "sources": [
     {
@@ -10,6 +10,14 @@
       "websiteBaseURL": "https://omegascans.org",
       "contentRating": "ADULT",
       "path": "bundles/OmegaScans/index.js"
+    },
+    {
+      "id": "MangaDistrict",
+      "name": "MangaDistrict",
+      "version": "1.0.0",
+      "websiteBaseURL": "https://mangadistrict.com",
+      "contentRating": "ADULT",
+      "path": "bundles/MangaDistrict/index.js"
     }
   ]
 }

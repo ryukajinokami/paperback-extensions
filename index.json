@@ -1,5 +1,5 @@
 {
-  "name": "OmegaScans Paperback Repository",
+  "name": "Paperback Manga Sources",
   "description": "Example repository index for Paperback v0.8. The official build output is bundles/versioning.json.",
   "versioning": "https://<your-github-username>.github.io/<your-repository-name>/versioning.json",
   "sources": [
@@ -8,6 +8,12 @@
       "name": "Omega Scans",
       "version": "1.0.0",
       "url": "https://<your-github-username>.github.io/<your-repository-name>/OmegaScans/index.js"
+    },
+    {
+      "id": "MangaDistrict",
+      "name": "MangaDistrict",
+      "version": "1.0.0",
+      "url": "https://<your-github-username>.github.io/<your-repository-name>/MangaDistrict/index.js"
     }
   ]
 }
