@@ -136,3 +136,7 @@ https://<your-github-username>.github.io/<your-repository-name>
 ```
 
 If you deploy the contents of `bundles/` under a subfolder, use that subfolder URL instead.
+
+## License
+
+This project is licensed under the MIT License. See [LICENSE](./LICENSE).
