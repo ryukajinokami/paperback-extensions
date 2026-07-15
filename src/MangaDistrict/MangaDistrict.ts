@@ -15,6 +15,7 @@ import {
   SearchField,
   SearchRequest,
   Searchable,
+  SourceInterceptor,
   SourceInfo,
   SourceIntents,
   SourceManga,
@@ -44,8 +45,21 @@ export const MangaDistrictInfo: SourceInfo = {
 }
 
 export class MangaDistrict implements Searchable, MangaProviding, ChapterProviding {
+  private readonly interceptor: SourceInterceptor = {
+    interceptRequest: async request => {
+      request.headers = {
+        ...request.headers,
+        ...this.headers(request.url)
+      }
+
+      return request
+    },
+    interceptResponse: async response => response
+  }
+
   readonly requestManager: RequestManager = App.createRequestManager({
-    requestsPerSecond: 2,
+    interceptor: this.interceptor,
+    requestsPerSecond: 1,
     requestTimeout: 20000
   })
 
@@ -259,10 +273,12 @@ export class MangaDistrict implements Searchable, MangaProviding, ChapterProvidi
   }
 
   private headers(url: string): Request['headers'] {
+    const imageRequest = /\.(?:jpg|jpeg|png|webp|gif)(?:[?#].*)?$/i.test(url)
+
     return {
-      referer: BASE_URL,
+      referer: `${BASE_URL}/`,
       origin: BASE_URL,
-      accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      accept: imageRequest ? 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8' : 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
       'user-agent': 'Paperback/0.8 MangaDistrict'
     }
   }

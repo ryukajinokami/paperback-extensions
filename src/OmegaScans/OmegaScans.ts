@@ -14,6 +14,7 @@ import {
   SearchField,
   SearchRequest,
   Searchable,
+  SourceInterceptor,
   SourceInfo,
   SourceIntents,
   SourceManga,
@@ -44,8 +45,21 @@ export const OmegaScansInfo: SourceInfo = {
 }
 
 export class OmegaScans implements Searchable, MangaProviding, ChapterProviding {
+  private readonly interceptor: SourceInterceptor = {
+    interceptRequest: async request => {
+      request.headers = {
+        ...request.headers,
+        ...this.headers(request.url)
+      }
+
+      return request
+    },
+    interceptResponse: async response => response
+  }
+
   readonly requestManager: RequestManager = App.createRequestManager({
-    requestsPerSecond: 3,
+    interceptor: this.interceptor,
+    requestsPerSecond: 2,
     requestTimeout: 20000
   })
 
@@ -363,10 +377,12 @@ export class OmegaScans implements Searchable, MangaProviding, ChapterProviding 
   }
 
   private headers(url: string): Request['headers'] {
+    const imageRequest = /\.(?:jpg|jpeg|png|webp|gif)(?:[?#].*)?$/i.test(url)
+
     return {
-      referer: BASE_URL,
+      referer: `${BASE_URL}/`,
       origin: BASE_URL,
-      accept: url.startsWith(API_URL) ? 'application/json, text/plain, */*' : 'text/html,application/xhtml+xml',
+      accept: imageRequest ? 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8' : url.startsWith(API_URL) ? 'application/json, text/plain, */*' : 'text/html,application/xhtml+xml',
       'user-agent': 'Paperback/0.8'
     }
   }
