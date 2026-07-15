@@ -1,0 +1,27 @@
+{
+  "name": "paperback-omegascans",
+  "version": "1.0.0",
+  "private": true,
+  "repositoryName": "OmegaScans Paperback Repository",
+  "description": "Paperback v0.8 source extension for Omega Scans.",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "paperback bundle",
+    "bundle": "paperback bundle",
+    "serve": "paperback serve"
+  },
+  "keywords": [
+    "paperback",
+    "paperback-extension",
+    "omegascans"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@paperback/toolchain": "0.8.0-alpha.38",
+    "@paperback/types": "0.8.0-alpha.38"
+  },
+  "devDependencies": {
+    "@types/node": "^18.11.9",
+    "typescript": "^4.8.3"
+  }
+}

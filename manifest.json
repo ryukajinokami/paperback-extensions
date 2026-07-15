@@ -1,0 +1,15 @@
+{
+  "name": "OmegaScans Paperback Repository",
+  "description": "Repository metadata for the Omega Scans Paperback v0.8 source.",
+  "version": "1.0.0",
+  "sources": [
+    {
+      "id": "OmegaScans",
+      "name": "Omega Scans",
+      "version": "1.0.0",
+      "websiteBaseURL": "https://omegascans.org",
+      "contentRating": "ADULT",
+      "path": "bundles/OmegaScans/index.js"
+    }
+  ]
+}

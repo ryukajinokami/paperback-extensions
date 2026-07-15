@@ -1,0 +1,8 @@
+node_modules/
+temp_build/
+bundles/
+lib/
+.idea/
+PaperBack.sln
+*.tgz
+.DS_Store
