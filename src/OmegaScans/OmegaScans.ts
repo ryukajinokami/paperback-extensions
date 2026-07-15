@@ -22,6 +22,7 @@ import {
 } from '@paperback/types'
 import { OmegaHomeSectionId, OmegaListResponse, OmegaSeries, SearchMetadata, ViewMoreMetadata, OmegaChapter, OmegaSearchParameters, OmegaTag } from './models'
 import { OmegaScansParser } from './OmegaScansParser'
+import { BUILD_VERSION } from './version'
 
 const BASE_URL = 'https://omegascans.org'
 const API_URL = 'https://api.omegascans.org'
@@ -33,7 +34,7 @@ export const OmegaScansInfo: SourceInfo = {
   description: 'Omega Scans source for Paperback v0.8. Supports search, details, chapters and reader pages.',
   contentRating: ContentRating.ADULT,
   icon: 'icon.png',
-  version: '1.0.0',
+  version: BUILD_VERSION,
   websiteBaseURL: BASE_URL,
   language: 'English',
   sourceTags: [

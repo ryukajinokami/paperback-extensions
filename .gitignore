@@ -2,6 +2,8 @@ node_modules/
 temp_build/
 bundles/
 lib/
+src/OmegaScans/version.ts
+src/MangaDistrict/version.ts
 .idea/
 PaperBack.sln
 *.tgz

@@ -99,6 +99,19 @@ npm run typecheck
 npm run build
 ```
 
+Before `typecheck`, `build`, `bundle` and `serve`, the project generates `src/version.ts` with a Paperback source version using:
+
+```text
+yyyy.m.d.build
+```
+
+Version generation rules:
+
+- Date uses the `Europe/Paris` timezone by default.
+- Override the timezone with `PAPERBACK_VERSION_TIMEZONE`.
+- Build number uses `PAPERBACK_BUILD_NUMBER`, then `GITHUB_RUN_NUMBER`, then the local Git commit count.
+- `package.json` keeps a SemVer value because npm does not accept the four-part Paperback version format.
+
 The build creates `bundles/`, including:
 
 - `bundles/OmegaScans/index.js`

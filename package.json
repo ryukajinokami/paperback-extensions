@@ -5,9 +5,14 @@
   "repositoryName": "Paperback Manga Sources",
   "description": "Paperback v0.8 source repository for multiple manga scan sites.",
   "scripts": {
+    "generate-version": "node scripts/generate-version.js",
+    "pretypecheck": "npm run generate-version",
     "typecheck": "tsc --noEmit",
+    "prebuild": "npm run generate-version",
     "build": "paperback bundle",
+    "prebundle": "npm run generate-version",
     "bundle": "paperback bundle",
+    "preserve": "npm run generate-version",
     "serve": "paperback serve"
   },
   "keywords": [

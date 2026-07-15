@@ -24,6 +24,7 @@ import {
 } from '@paperback/types'
 import { MangaDistrictHomeSectionId, MangaDistrictSearchMetadata, MangaDistrictSearchParameters, MangaDistrictViewMoreMetadata } from './models'
 import { MangaDistrictParser } from './MangaDistrictParser'
+import { BUILD_VERSION } from './version'
 
 const BASE_URL = 'https://mangadistrict.com'
 
@@ -33,7 +34,7 @@ export const MangaDistrictInfo: SourceInfo = {
   description: 'MangaDistrict source for Paperback v0.8. Supports search, details, chapters and reader pages.',
   contentRating: ContentRating.ADULT,
   icon: 'icon.png',
-  version: '1.0.0',
+  version: BUILD_VERSION,
   websiteBaseURL: BASE_URL,
   language: 'English',
   sourceTags: [
