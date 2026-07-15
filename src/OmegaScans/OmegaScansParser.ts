@@ -171,6 +171,12 @@ export class OmegaScansParser {
 
   private extractReaderImages(mangaId: string, html: string): string[] {
     const decoded = this.decodeText(html)
+    const renderedImages = this.extractRenderedReaderImages(decoded)
+
+    if (renderedImages.length > 0) {
+      return renderedImages
+    }
+
     const escapedSlug = this.escapeRegExp(mangaId)
     const imagePattern = new RegExp(
       `https?://media\\.omegascans\\.org/file/[^"'<>,\\s]+/uploads/series/${escapedSlug}/[^"'<>,\\s]+?\\.(?:jpg|jpeg|png|webp|gif)`,
@@ -190,6 +196,34 @@ export class OmegaScansParser {
     }
 
     return pages
+  }
+
+  private extractRenderedReaderImages(html: string): string[] {
+    const imageTags = html.match(/<img[^>]+>/gi) ?? []
+    const seen: Record<string, boolean> = {}
+    const pages: string[] = []
+
+    for (const tag of imageTags) {
+      if (!/\bobject-contain\b/i.test(tag)) {
+        continue
+      }
+
+      const source = /\bsrc=["']([^"']+)["']/i.exec(tag)?.[1] ?? ''
+      const url = this.normalizeUrl(source)
+
+      if (!this.isOmegaMediaImage(url) || seen[url]) {
+        continue
+      }
+
+      seen[url] = true
+      pages.push(url)
+    }
+
+    return pages
+  }
+
+  private isOmegaMediaImage(url: string): boolean {
+    return /^https?:\/\/media\.omegascans\.org\/file\/[^"'<>,\s]+?\.(?:jpg|jpeg|png|webp|gif)(?:[?#].*)?$/i.test(url)
   }
 
   private extractNovelPages(html: string): string[] {
