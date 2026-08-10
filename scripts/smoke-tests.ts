@@ -1,0 +1,111 @@
+import { MangaDistrictParser } from '../src/MangaDistrict/MangaDistrictParser'
+import { LelMangaParser } from '../src/LelManga/LelMangaParser'
+import { OmegaScansParser } from '../src/OmegaScans/OmegaScansParser'
+import { PoseidonScansParser } from '../src/PoseidonScans/PoseidonScansParser'
+
+const identity = <T>(value: T): T => value
+
+;(globalThis as unknown as { App: unknown }).App = {
+  createChapter: identity,
+  createChapterDetails: identity,
+  createMangaInfo: identity,
+  createPagedResults: identity,
+  createPartialSourceManga: identity,
+  createTag: identity,
+  createTagSection: identity
+}
+
+const cases = [
+  {
+    name: 'Omega Scans',
+    url: 'https://omegascans.org/series/my-new-family-treats-me-well/chapter-2',
+    parse: (html: string) => new OmegaScansParser('https://omegascans.org', 'https://api.omegascans.org')
+      .parseChapterDetails('my-new-family-treats-me-well', 'chapter-2', html).pages
+  },
+  {
+    name: 'MangaDistrict',
+    url: 'https://mangadistrict.com/series/crime-and-punishment-daktaryeong-uncensored/chapter-1/',
+    parse: (html: string) => new MangaDistrictParser('https://mangadistrict.com')
+      .parseChapterDetails('crime-and-punishment-daktaryeong-uncensored', 'chapter-1', html).pages
+  },
+  {
+    name: 'Poseidon Scans',
+    url: 'https://poseidon-scans.net/serie/solo-farming-in-the-tower/chapter/120',
+    parse: (html: string) => new PoseidonScansParser('https://poseidon-scans.net')
+      .parseChapterDetails('solo-farming-in-the-tower', '120', html).pages
+  },
+  {
+    name: 'LelManga',
+    url: 'https://www.lelmanga.com/one-piece-1190',
+    parse: (html: string) => new LelMangaParser('https://www.lelmanga.com')
+      .parseChapterDetails('manga/one-piece', 'one-piece-1190', html).pages
+  }
+]
+
+async function main(): Promise<void> {
+  for (const item of cases) {
+    const response = await fetch(item.url, {
+      headers: {
+        'accept-language': 'fr-FR,fr;q=0.9,en;q=0.8',
+        'user-agent': 'Mozilla/5.0 Paperback source smoke test'
+      }
+    })
+
+    if (!response.ok) throw new Error(`${item.name}: HTTP ${response.status} for ${item.url}`)
+    const pages = item.parse(await response.text())
+    if (pages.length === 0) throw new Error(`${item.name}: no reader pages found`)
+    console.log(`${item.name}: ${pages.length} reader pages`)
+  }
+
+  const omegaParser = new OmegaScansParser('https://omegascans.org', 'https://api.omegascans.org')
+  const omegaResponse = await request('https://api.omegascans.org/series/my-new-family-treats-me-well')
+  const omegaInfo = omegaParser.parseMangaDetails(JSON.parse(omegaResponse) as Parameters<typeof omegaParser.parseMangaDetails>[0])
+  if (omegaInfo.titles.length === 0) throw new Error('Omega Scans: series metadata is empty')
+
+  const districtParser = new MangaDistrictParser('https://mangadistrict.com')
+  const districtHtml = await request('https://mangadistrict.com/series/crime-and-punishment-daktaryeong-uncensored/')
+  const districtInfo = districtParser.parseMangaDetails('crime-and-punishment-daktaryeong-uncensored', districtHtml)
+  if (districtInfo.titles.length === 0) throw new Error('MangaDistrict: series metadata is empty')
+
+  const poseidonParser = new PoseidonScansParser('https://poseidon-scans.net')
+  const poseidonHtml = await request('https://poseidon-scans.net/serie/solo-farming-in-the-tower')
+  const poseidonInfo = poseidonParser.parseMangaDetails('solo-farming-in-the-tower', poseidonHtml)
+  const catalogueHtml = await request('https://poseidon-scans.net/series?sortBy=popular')
+  const searchTags = poseidonParser.parseSearchTags(catalogueHtml)
+  if (poseidonInfo.titles.length === 0 || (searchTags[0]?.tags.length ?? 0) === 0) {
+    throw new Error('Poseidon Scans: series metadata or catalogue tags are empty')
+  }
+
+  const lelMangaParser = new LelMangaParser('https://www.lelmanga.com')
+  const lelMangaHtml = await request('https://www.lelmanga.com/manga/one-piece')
+  const lelMangaInfo = lelMangaParser.parseMangaDetails('manga/one-piece', lelMangaHtml)
+  const lelMangaChapters = lelMangaParser.parseChapters('manga/one-piece', lelMangaHtml)
+  const lelMangaCatalogue = await request('https://www.lelmanga.com/manga')
+  const lelMangaTags = lelMangaParser.parseSearchTags(lelMangaCatalogue)
+  const lelMangaResults = lelMangaParser.parseMangaList(lelMangaCatalogue, 1)
+  if (lelMangaInfo.titles.length === 0 || lelMangaChapters.length === 0 || lelMangaResults.results.length === 0 || (lelMangaTags[0]?.tags.length ?? 0) === 0) {
+    throw new Error('LelManga: catalogue, metadata, chapters or tags are empty')
+  }
+
+  console.log(`Series metadata: Omega ${omegaInfo.titles.length}, MangaDistrict ${districtInfo.titles.length}, Poseidon ${poseidonInfo.titles.length}, LelManga ${lelMangaInfo.titles.length} titles`)
+  console.log(`Poseidon Scans: ${searchTags[0]?.tags.length ?? 0} catalogue genres`)
+  console.log(`LelManga: ${lelMangaResults.results.length} catalogue entries, ${lelMangaChapters.length} chapters, ${lelMangaTags[0]?.tags.length ?? 0} genres`)
+}
+
+async function request(url: string): Promise<string> {
+  const response = await fetch(url, {
+    headers: {
+      accept: url.includes('api.omegascans.org') ? 'application/json' : 'text/html',
+      'accept-language': 'fr-FR,fr;q=0.9,en;q=0.8',
+      'user-agent': 'Mozilla/5.0 Paperback source smoke test'
+    }
+  })
+
+  if (!response.ok) throw new Error(`HTTP ${response.status} for ${url}`)
+  return response.text()
+}
+
+void main().catch(error => {
+  console.error(error)
+  process.exitCode = 1
+})

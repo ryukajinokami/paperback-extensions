@@ -20,7 +20,7 @@ import {
   SourceManga,
   TagSection
 } from '@paperback/types'
-import { PoseidonHomeSectionId, PoseidonSearchMetadata, PoseidonViewMoreMetadata } from './models'
+import { PoseidonHomeSectionId, PoseidonSearchMetadata, PoseidonSearchParameters, PoseidonViewMoreMetadata } from './models'
 import { PoseidonScansParser } from './PoseidonScansParser'
 import { BUILD_VERSION } from './version'
 
@@ -66,17 +66,42 @@ export class PoseidonScans implements Searchable, MangaProviding, ChapterProvidi
 
   async getSearchResults(query: SearchRequest, metadata: unknown | undefined): Promise<PagedResults> {
     const page = (metadata as PoseidonSearchMetadata | undefined)?.page ?? 1
-    const html = await this.requestText(this.parser.buildSearchUrl(query.title ?? '', page))
+    const filters = this.parser.splitSearchTags(query.includedTags)
+    const parameters = this.normalizeSearchParameters(query.parameters as PoseidonSearchParameters)
+    if (!filters.status && parameters.status) filters.status = parameters.status
+    const html = await this.requestText(this.parser.buildSearchUrl(query.title ?? '', page, filters, parameters))
 
     return this.parser.parseMangaList(html, page)
   }
 
   async getSearchTags(): Promise<TagSection[]> {
-    return []
+    const html = await this.requestText(this.parser.buildCatalogueUrl(1))
+    return this.parser.parseSearchTags(html)
   }
 
   async getSearchFields(): Promise<SearchField[]> {
-    return []
+    return [
+      App.createSearchField({
+        id: 'status',
+        name: 'Statut',
+        placeholder: 'en cours, terminé, en pause ou annulé'
+      }),
+      App.createSearchField({
+        id: 'sortBy',
+        name: 'Trier par',
+        placeholder: 'latest_chapter, most_chapters, popular, alpha ou recent'
+      }),
+      App.createSearchField({
+        id: 'minChapters',
+        name: 'Chapitres minimum',
+        placeholder: '0'
+      }),
+      App.createSearchField({
+        id: 'maxChapters',
+        name: 'Chapitres maximum',
+        placeholder: '500'
+      })
+    ]
   }
 
   async supportsTagExclusion(): Promise<boolean> {
@@ -113,30 +138,37 @@ export class PoseidonScans implements Searchable, MangaProviding, ChapterProvidi
   }
 
   async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
-    const section = App.createHomeSection({
-      id: PoseidonHomeSectionId.Catalogue,
-      title: 'Catalogue',
-      type: HomeSectionType.singleRowNormal,
-      items: [],
-      containsMoreItems: true
-    })
+    const sections = [
+      this.homeSection(PoseidonHomeSectionId.LatestChapters, 'Derniers chapitres'),
+      this.homeSection(PoseidonHomeSectionId.Popular, 'Populaires'),
+      this.homeSection(PoseidonHomeSectionId.NewSeries, 'Nouvelles séries'),
+      this.homeSection(PoseidonHomeSectionId.Catalogue, 'Catalogue')
+    ]
 
-    sectionCallback(section)
+    for (const section of sections) sectionCallback(section)
 
-    try {
-      const results = await this.getViewMoreItems(section.id, { page: 1 })
-      section.items = results.results
-      section.containsMoreItems = results.metadata !== undefined
-      sectionCallback(section)
-    } catch (error) {
-      console.log(`Poseidon Scans homepage section failed: ${String(error)}`)
-    }
+    await Promise.all(sections.map(async section => {
+      try {
+        const results = await this.getViewMoreItems(section.id, { page: 1 })
+        section.items = results.results
+        section.containsMoreItems = results.metadata !== undefined
+        sectionCallback(section)
+      } catch (error) {
+        console.log(`Poseidon Scans homepage section failed: ${section.id} ${String(error)}`)
+      }
+    }))
   }
 
   async getViewMoreItems(homepageSectionId: string, metadata: unknown | undefined): Promise<PagedResults> {
     const page = (metadata as PoseidonViewMoreMetadata | undefined)?.page ?? 1
 
     switch (homepageSectionId) {
+      case PoseidonHomeSectionId.LatestChapters:
+        return this.getCataloguePage(page, 'latest_chapter')
+      case PoseidonHomeSectionId.Popular:
+        return this.getCataloguePage(page, 'popular')
+      case PoseidonHomeSectionId.NewSeries:
+        return this.getCataloguePage(page, 'recent')
       case PoseidonHomeSectionId.Catalogue:
         return this.getCataloguePage(page)
       default:
@@ -144,10 +176,40 @@ export class PoseidonScans implements Searchable, MangaProviding, ChapterProvidi
     }
   }
 
-  private async getCataloguePage(page: number): Promise<PagedResults> {
-    const html = await this.requestText(this.parser.buildCatalogueUrl(page))
+  private async getCataloguePage(page: number, sortBy?: string): Promise<PagedResults> {
+    const html = await this.requestText(this.parser.buildCatalogueUrl(page, sortBy))
 
     return this.parser.parseMangaList(html, page)
+  }
+
+  private homeSection(id: PoseidonHomeSectionId, title: string): HomeSection {
+    return App.createHomeSection({
+      id,
+      title,
+      type: HomeSectionType.singleRowNormal,
+      items: [],
+      containsMoreItems: true
+    })
+  }
+
+  private normalizeSearchParameters(parameters: PoseidonSearchParameters): PoseidonSearchParameters {
+    const allowedStatuses = ['en cours', 'terminé', 'en pause', 'annulé']
+    const allowedSorts = ['latest_chapter', 'most_chapters', 'popular', 'alpha', 'recent']
+    const status = (parameters.status ?? '').trim().toLowerCase()
+    const sortBy = (parameters.sortBy ?? '').trim().toLowerCase()
+
+    return {
+      status: allowedStatuses.includes(status) ? status : undefined,
+      sortBy: allowedSorts.includes(sortBy) ? sortBy : undefined,
+      minChapters: this.normalizeChapterLimit(parameters.minChapters),
+      maxChapters: this.normalizeChapterLimit(parameters.maxChapters)
+    }
+  }
+
+  private normalizeChapterLimit(value: string | undefined): string | undefined {
+    if (!value?.trim()) return undefined
+    const number = Math.max(0, Math.min(500, Math.round(Number(value))))
+    return Number.isFinite(number) ? String(number) : undefined
   }
 
   private async requestText(url: string): Promise<string> {

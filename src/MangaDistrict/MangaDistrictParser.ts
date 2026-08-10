@@ -1,5 +1,7 @@
 import { Chapter, ChapterDetails, MangaInfo, PagedResults, PartialSourceManga, Tag, TagSection } from '@paperback/types'
 import { MangaDistrictGenre } from './models'
+import { createReaderError } from '../utils/readerError'
+import { normalizeHttpUrl } from '../utils/url'
 
 const CARD_PAGE_SIZE = 30
 
@@ -17,13 +19,14 @@ export class MangaDistrictParser {
 
   parseMangaDetails(mangaId: string, html: string): MangaInfo {
     const title = this.extractSeriesTitle(html) || this.titleFromSlug(mangaId)
+    const alternativeTitles = this.splitTitles(this.extractLabeledSummary(html, 'Alternative'))
     const cover = this.extractCover(html)
     const genres = this.parseGenresFromDetails(html)
     const status = this.extractLabeledSummary(html, 'Status') || 'Unknown'
 
     return App.createMangaInfo({
       image: cover,
-      titles: [title],
+      titles: Array.from(new Set([title, ...alternativeTitles])),
       author: this.extractNamedContent(html, 'author-content') || 'Unknown',
       artist: this.extractNamedContent(html, 'artist-content') || 'Unknown',
       desc: this.extractDescription(html),
@@ -31,7 +34,8 @@ export class MangaDistrictParser {
       hentai: true,
       rating: this.extractRating(html),
       tags: [this.toTagSection(genres)],
-      covers: cover.length > 0 ? [cover] : []
+      covers: cover.length > 0 ? [cover] : [],
+      additionalInfo: this.seriesAdditionalInfo(html)
     })
   }
 
@@ -72,7 +76,7 @@ export class MangaDistrictParser {
     const pages = this.extractReaderImages(html)
 
     if (pages.length === 0) {
-      throw new Error(`No readable MangaDistrict pages found for ${mangaId}/${chapterId}`)
+      throw createReaderError('MangaDistrict', mangaId, chapterId, html)
     }
 
     return App.createChapterDetails({
@@ -159,21 +163,7 @@ export class MangaDistrictParser {
   }
 
   normalizeUrl(value: string): string {
-    const cleaned = this.decodeText(value.trim()).replace(/\\\//g, '/')
-
-    if (cleaned.length === 0 || cleaned.startsWith('data:')) {
-      return ''
-    }
-
-    if (cleaned.startsWith('//')) {
-      return `https:${cleaned}`
-    }
-
-    if (cleaned.startsWith('/')) {
-      return `${this.baseUrl}${cleaned}`
-    }
-
-    return cleaned
+    return normalizeHttpUrl(this.decodeText(value), this.baseUrl)
   }
 
   private parseMangaCards(html: string): PartialSourceManga[] {
@@ -315,6 +305,25 @@ export class MangaDistrictParser {
     const rating = Number(this.cleanHtml(value ?? ''))
 
     return Number.isFinite(rating) ? rating : undefined
+  }
+
+  private seriesAdditionalInfo(html: string): Record<string, string> {
+    const info: Record<string, string> = {}
+    const fields = ['Type', 'Release', 'Status']
+
+    for (const field of fields) {
+      const value = this.extractLabeledSummary(html, field)
+      if (value.length > 0) info[field] = value
+    }
+
+    return info
+  }
+
+  private splitTitles(value: string): string[] {
+    return value
+      .split(/[|;,]/)
+      .map(title => this.cleanText(title))
+      .filter(title => title.length > 0 && title.toLowerCase() !== 'n/a')
   }
 
   private extractReaderImages(html: string): string[] {

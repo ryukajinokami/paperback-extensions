@@ -32,6 +32,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test parsers
+        run: npm test
+
       - name: Build Paperback bundles
         env:
           PAPERBACK_BUILD_NUMBER: ${{ github.run_number }}

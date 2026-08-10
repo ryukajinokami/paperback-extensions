@@ -6,7 +6,22 @@ export interface PoseidonViewMoreMetadata {
   page: number
 }
 
+export interface PoseidonSearchParameters {
+  status?: string
+  sortBy?: string
+  minChapters?: string
+  maxChapters?: string
+}
+
+export interface PoseidonSearchFilters {
+  tags: string[]
+  status?: string
+}
+
 export const enum PoseidonHomeSectionId {
+  LatestChapters = 'latest_chapters',
+  Popular = 'popular',
+  NewSeries = 'new_series',
   Catalogue = 'catalogue'
 }
 

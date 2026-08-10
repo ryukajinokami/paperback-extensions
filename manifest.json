@@ -26,6 +26,14 @@
       "websiteBaseURL": "https://poseidon-scans.net",
       "contentRating": "MATURE",
       "path": "bundles/PoseidonScans/index.js"
+    },
+    {
+      "id": "LelManga",
+      "name": "LelManga",
+      "version": "1.0.0",
+      "websiteBaseURL": "https://www.lelmanga.com",
+      "contentRating": "MATURE",
+      "path": "bundles/LelManga/index.js"
     }
   ]
 }

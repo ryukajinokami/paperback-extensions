@@ -9,8 +9,9 @@ This repository targets `@paperback/types` and `@paperback/toolchain` `0.8.0-alp
 - Omega Scans: https://omegascans.org
 - MangaDistrict: https://mangadistrict.com
 - Poseidon Scans: https://poseidon-scans.net
+- LelManga: https://www.lelmanga.com
 
-Omega Scans and MangaDistrict are marked `ADULT`. Poseidon Scans is marked `MATURE`.
+Omega Scans and MangaDistrict are marked `ADULT`. Poseidon Scans and LelManga are marked `MATURE`.
 
 ## Support Matrix: Omega Scans
 
@@ -23,6 +24,7 @@ Implemented:
 - Search fields for type, status, ordering field and ordering direction.
 - Comic and novel series metadata.
 - Series details: title, cover, description, genres, status, author, artist/studio, rating.
+- Alternative titles and additional type, view, chapter and bookmark metadata when exposed by the API.
 - Free chapter list.
 - Comic reader pages from the public chapter HTML.
 - Best-effort novel text chapters rendered as SVG data-image pages.
@@ -30,6 +32,7 @@ Implemented:
 - Share URLs.
 - Stable manga/chapter IDs based on OmegaScans slugs for tracker compatibility.
 - Network error handling with explicit HTTP and JSON errors.
+- Reader diagnostics for missing, restricted and blocked chapter pages.
 
 Intentionally not implemented:
 
@@ -56,6 +59,7 @@ Implemented:
 - Tag exclusion by filtering the current result page against each series details page.
 - Search field for ordering.
 - Series details: title, cover, description, genres, status, author, artist and rating when exposed.
+- Alternative titles and additional type, release year and status metadata.
 - Public chapter list from `wp-manga-chapter` entries.
 - Reader pages from `reading-content` / `wp-manga-chapter-img`.
 - Filtering of logos, thumbnails, generic splash images, ads and non-reader images.
@@ -63,6 +67,7 @@ Implemented:
 - Share URLs.
 - Stable manga/chapter IDs based on MangaDistrict slugs for tracker compatibility.
 - Network error handling with explicit HTTP errors.
+- Reader diagnostics for missing, restricted and blocked chapter pages.
 
 Intentionally not implemented:
 
@@ -82,22 +87,25 @@ Notes:
 Implemented:
 
 - Series search through the public Poseidon catalogue pages.
+- Search filters for genres, type, status and chapter-count range.
+- Catalogue sorting by latest chapter, chapter count, popularity, title or recently added series.
 - Paged catalogue browsing.
-- Series details: title, cover, banner, description, genres, status, author, artist and rating when exposed.
+- Series details: title, alternative titles, cover, banner, description, genres, status, author, artist and rating when exposed.
+- Additional type, release year, view and favorite metadata when exposed.
 - Public/free chapter list from series pages.
 - Filtering of restricted future/premium chapters marked as not yet free.
 - Reader pages from public chapter HTML image URLs.
-- Homepage section: catalogue.
+- Homepage sections: latest chapters, popular series, new series and catalogue.
 - Share URLs.
 - Stable manga/chapter IDs based on Poseidon slugs and numeric chapter paths.
 - Network error handling with explicit HTTP errors.
+- Reader diagnostics for missing, restricted and blocked chapter pages.
 
 Intentionally not implemented:
 
 - Login.
 - Premium chapter unlocks, shard unlocks or account-only content.
 - Account favorites, comments, notifications or ratings.
-- Genre filtering, because the public catalogue search page does not expose stable genre query parameters.
 - Native tracker implementation. Paperback/external trackers can still match by stable IDs and chapter numbers.
 
 Notes:
@@ -105,6 +113,28 @@ Notes:
 - Poseidon Scans is a French Next.js site. Public HTML and server-rendered data can change without API versioning.
 - Chapter IDs use the number/path segment from URLs like `/serie/{slug}/chapter/{number}`.
 - The reader parser keeps only public `/api/chapters/{series}/{chapter}/{page}` image URLs and ignores previews/comments.
+
+## Support Matrix: LelManga
+
+Implemented:
+
+- French manga, manhwa, manhua and comic catalogue search.
+- Native genre, status, type and ordering filters.
+- Series details, genres, rating, type and follower count when exposed.
+- Public chapter lists and reader images.
+- Homepage sections for latest updates, popular titles and new series.
+- Stable IDs which retain the series route type, for example `manga/one-piece`.
+- Shared URL normalization and explicit reader diagnostics.
+
+Intentionally not implemented:
+
+- Login, account bookmarks, comments or ratings.
+- Native tracker implementation. Paperback/external trackers can still match by stable IDs and chapter numbers.
+
+Notes:
+
+- LelManga is a public French WordPress/MangaReader site. Its HTML can change without API versioning.
+- Chapter IDs use their root path, for example `one-piece-1190`.
 
 ## Search Fields
 
@@ -123,17 +153,45 @@ MangaDistrict:
 
 Poseidon Scans:
 
-- No custom fields. Use the standard Paperback title search.
+- `Statut`: `en cours`, `terminé`, `en pause`, or `annulé`.
+- `Trier par`: `latest_chapter`, `most_chapters`, `popular`, `alpha`, or `recent`.
+- `Chapitres minimum`: a number from `0` to `500`.
+- `Chapitres maximum`: a number from `0` to `500`.
+- Genres and types (`MANGA`, `MANHUA`, `MANHWA`) are available as standard Paperback search tags.
+
+LelManga:
+
+- `Statut`: `ongoing`, `completed`, or `hiatus`.
+- `Type`: `manga`, `manhwa`, `manhua`, or `comic`.
+- `Trier par`: `update`, `latest`, `popular`, `title`, or `titlereverse`.
+- Genres are available as standard Paperback search tags.
+
+## Tests
+
+Run deterministic parser regression tests:
+
+```bash
+npm test
+```
+
+Run optional live reader smoke tests against one public chapter from each source:
+
+```bash
+npm run test:live
+```
+
+The live tests currently cover Omega Scans, MangaDistrict, Poseidon Scans and LelManga. They are intentionally not scheduled and are not part of the deployment workflow because external sites can be temporarily unavailable. GitHub Actions runs type checking and deterministic parser tests before building the repository.
 
 ## Build
 
 ```bash
 npm install
+npm test
 npm run typecheck
 npm run build
 ```
 
-Before `typecheck`, `build`, `bundle` and `serve`, the project generates `src/version.ts` with a Paperback source version using:
+Before `typecheck`, `build`, `bundle` and `serve`, the project generates a `version.ts` file in each source directory using:
 
 ```text
 yyyy.m.d.build
@@ -154,6 +212,8 @@ The build creates `bundles/`, including:
 - `bundles/MangaDistrict/source.js`
 - `bundles/PoseidonScans/index.js`
 - `bundles/PoseidonScans/source.js`
+- `bundles/LelManga/index.js`
+- `bundles/LelManga/source.js`
 - `bundles/versioning.json`
 - `bundles/index.html`
 

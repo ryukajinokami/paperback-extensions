@@ -1,5 +1,7 @@
 import { Chapter, ChapterDetails, MangaInfo, PagedResults, PartialSourceManga, Tag, TagSection } from '@paperback/types'
 import { OmegaChapter, OmegaListResponse, OmegaSeries, OmegaTag } from './models'
+import { createReaderError } from '../utils/readerError'
+import { normalizeHttpUrl } from '../utils/url'
 
 export class OmegaScansParser {
   constructor(
@@ -29,7 +31,8 @@ export class OmegaScansParser {
       hentai: true,
       rating: typeof series.rating === 'number' ? series.rating : undefined,
       tags: [this.toTagSection(series.tags ?? [])],
-      covers: [this.normalizeUrl(series.thumbnail ?? '')].filter(url => url.length > 0)
+      covers: [this.normalizeUrl(series.thumbnail ?? '')].filter(url => url.length > 0),
+      additionalInfo: this.seriesAdditionalInfo(series)
     })
   }
 
@@ -53,7 +56,7 @@ export class OmegaScansParser {
     const resolvedPages = pages.length > 0 ? pages : this.extractNovelPages(html)
 
     if (resolvedPages.length === 0) {
-      throw new Error(`No readable pages found for ${mangaId}/${chapterId}`)
+      throw createReaderError('Omega Scans', mangaId, chapterId, html)
     }
 
     return App.createChapterDetails({
@@ -130,26 +133,7 @@ export class OmegaScansParser {
   }
 
   normalizeUrl(value: string): string {
-    const cleaned = this.decodeText(value.trim()).replace(/ /g, '%20')
-
-    if (cleaned.length === 0) {
-      return ''
-    }
-
-    const proxiedImage = /[?&]url=([^&]+)/.exec(cleaned)
-    if (cleaned.startsWith('/_next/image') && proxiedImage?.[1]) {
-      return decodeURIComponent(proxiedImage[1])
-    }
-
-    if (cleaned.startsWith('//')) {
-      return `https:${cleaned}`
-    }
-
-    if (cleaned.startsWith('/')) {
-      return `${this.baseUrl}${cleaned}`
-    }
-
-    return cleaned
+    return normalizeHttpUrl(this.decodeText(value), this.baseUrl, { allowDataUrl: true })
   }
 
   buildSeriesUrl(mangaId: string): string {
@@ -224,6 +208,17 @@ export class OmegaScansParser {
 
   private isOmegaMediaImage(url: string): boolean {
     return /^https?:\/\/media\.omegascans\.org\/file\/[^"'<>,\s]+?\.(?:jpg|jpeg|png|webp|gif)(?:[?#].*)?$/i.test(url)
+  }
+
+  private seriesAdditionalInfo(series: OmegaSeries): Record<string, string> {
+    const info: Record<string, string> = {}
+
+    if (series.series_type) info.Type = this.cleanText(series.series_type)
+    if (typeof series.total_views === 'number') info.Views = String(series.total_views)
+    if (series.meta?.chapters_count) info.Chapters = this.cleanText(series.meta.chapters_count)
+    if (series.meta?.who_bookmarked_count) info.Bookmarks = this.cleanText(series.meta.who_bookmarked_count)
+
+    return info
   }
 
   private extractNovelPages(html: string): string[] {

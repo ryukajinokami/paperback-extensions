@@ -17,5 +17,6 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
-  }
+  },
+  "exclude": ["tests", "scripts/smoke-tests.ts"]
 }

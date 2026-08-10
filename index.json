@@ -20,6 +20,12 @@
       "name": "Poseidon Scans",
       "version": "1.0.0",
       "url": "https://<your-github-username>.github.io/<your-repository-name>/PoseidonScans/index.js"
+    },
+    {
+      "id": "LelManga",
+      "name": "LelManga",
+      "version": "1.0.0",
+      "url": "https://<your-github-username>.github.io/<your-repository-name>/LelManga/index.js"
     }
   ]
 }

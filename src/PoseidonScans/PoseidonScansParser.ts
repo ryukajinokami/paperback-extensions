@@ -1,5 +1,7 @@
-import { Chapter, ChapterDetails, MangaInfo, PagedResults, PartialSourceManga, TagSection } from '@paperback/types'
-import { PoseidonJsonLd } from './models'
+import { Chapter, ChapterDetails, MangaInfo, PagedResults, PartialSourceManga, Tag, TagSection } from '@paperback/types'
+import { PoseidonJsonLd, PoseidonSearchFilters, PoseidonSearchParameters } from './models'
+import { createReaderError } from '../utils/readerError'
+import { normalizeHttpUrl } from '../utils/url'
 
 const CATALOGUE_PAGE_SIZE = 20
 
@@ -16,15 +18,60 @@ export class PoseidonScansParser {
     })
   }
 
+  parseSearchTags(html: string): TagSection[] {
+    const text = this.searchableHtml(html)
+    const genres = this.parseSerializedArray(text, 'allTags')
+    const types = this.parseSerializedArray(text, 'allTypes')
+
+    return [
+      App.createTagSection({
+        id: 'genres',
+        label: 'Genres',
+        tags: genres.map(label => App.createTag({ id: `genre:${label}`, label }))
+      }),
+      App.createTagSection({
+        id: 'types',
+        label: 'Types',
+        tags: types.map(label => App.createTag({ id: `type:${label}`, label }))
+      }),
+      App.createTagSection({
+        id: 'status',
+        label: 'Statut',
+        tags: [
+          App.createTag({ id: 'status:en cours', label: 'En cours' }),
+          App.createTag({ id: 'status:terminé', label: 'Terminé' }),
+          App.createTag({ id: 'status:en pause', label: 'En pause' }),
+          App.createTag({ id: 'status:annulé', label: 'Annulé' })
+        ]
+      })
+    ]
+  }
+
+  splitSearchTags(tags: Tag[]): PoseidonSearchFilters {
+    const filters: PoseidonSearchFilters = { tags: [] }
+
+    for (const tag of tags) {
+      if (tag.id.startsWith('status:')) {
+        filters.status = tag.id.slice('status:'.length)
+      } else if (tag.id.startsWith('genre:') || tag.id.startsWith('type:')) {
+        filters.tags.push(tag.id.slice(tag.id.indexOf(':') + 1))
+      }
+    }
+
+    return filters
+  }
+
   parseMangaDetails(mangaId: string, html: string): MangaInfo {
     const series = this.findJsonLd(html, 'ComicSeries')
     const title = this.cleanText(series?.name ?? '') || this.titleFromSlug(mangaId)
     const cover = this.normalizeUrl(this.imageValue(series?.image) || this.extractMetaContent(html, 'og:image') || `/api/covers/${mangaId}.webp`)
     const genres = this.stringArray(series?.genre)
 
+    const alternativeTitles = this.splitTitles(this.extractSerializedString(html, 'alternativeNames'))
+
     return App.createMangaInfo({
       image: cover,
-      titles: [title],
+      titles: Array.from(new Set([title, ...alternativeTitles])),
       author: this.personName(series?.author),
       artist: this.personName(series?.artist),
       desc: this.cleanText(series?.description ?? this.extractMetaContent(html, 'description')),
@@ -33,7 +80,8 @@ export class PoseidonScansParser {
       rating: this.extractRating(html),
       tags: genres.length > 0 ? [this.toTagSection(genres)] : [],
       covers: cover.length > 0 ? [cover] : [],
-      banner: this.normalizeUrl(`/api/banners-mangas/${mangaId}.webp`)
+      banner: this.normalizeUrl(`/api/banners-mangas/${mangaId}.webp`),
+      additionalInfo: this.seriesAdditionalInfo(html)
     })
   }
 
@@ -93,7 +141,7 @@ export class PoseidonScansParser {
     const pages = this.extractReaderImages(mangaId, html)
 
     if (pages.length === 0) {
-      throw new Error(`No readable Poseidon Scans pages found for ${mangaId}/${chapterId}`)
+      throw createReaderError('Poseidon Scans', mangaId, chapterId, html)
     }
 
     return App.createChapterDetails({
@@ -103,22 +151,32 @@ export class PoseidonScansParser {
     })
   }
 
-  buildCatalogueUrl(page: number): string {
-    return this.buildUrl('/series', page > 1 ? [['page', String(page)]] : [])
-  }
-
-  buildSearchUrl(title: string, page: number): string {
+  buildCatalogueUrl(page: number, sortBy?: string): string {
     const parameters: Array<[string, string]> = []
-
-    if (title.trim().length > 0) {
-      parameters.push(['search', title.trim()])
-    }
-
-    if (page > 1) {
-      parameters.push(['page', String(page)])
-    }
+    if (sortBy) parameters.push(['sortBy', sortBy])
+    if (page > 1) parameters.push(['page', String(page)])
 
     return this.buildUrl('/series', parameters)
+  }
+
+  buildSearchUrl(title: string, page: number, filters: PoseidonSearchFilters, parameters: PoseidonSearchParameters): string {
+    const query: Array<[string, string]> = []
+
+    if (title.trim().length > 0) {
+      query.push(['search', title.trim()])
+    }
+
+    if (filters.tags.length > 0) query.push(['tags', filters.tags.join(',')])
+    if (filters.status) query.push(['status', filters.status])
+    if (parameters.sortBy) query.push(['sortBy', parameters.sortBy])
+    if (parameters.minChapters) query.push(['minChapters', parameters.minChapters])
+    if (parameters.maxChapters) query.push(['maxChapters', parameters.maxChapters])
+
+    if (page > 1) {
+      query.push(['page', String(page)])
+    }
+
+    return this.buildUrl('/series', query)
   }
 
   buildSeriesUrl(mangaId: string): string {
@@ -131,25 +189,7 @@ export class PoseidonScansParser {
 
   normalizeUrl(value: string): string {
     const cleaned = this.decodeText(value.trim()).split(',')[0]?.trim().replace(/\s+\d+[wx]$/, '') ?? ''
-
-    if (cleaned.length === 0 || cleaned.startsWith('data:')) {
-      return ''
-    }
-
-    const proxied = /\/_next\/image\?url=([^&]+)/.exec(cleaned)
-    if (proxied?.[1]) {
-      return this.normalizeUrl(this.safeDecodeURIComponent(proxied[1]))
-    }
-
-    if (cleaned.startsWith('//')) {
-      return `https:${cleaned}`
-    }
-
-    if (cleaned.startsWith('/')) {
-      return `${this.baseUrl}${cleaned}`
-    }
-
-    return cleaned
+    return normalizeHttpUrl(cleaned, this.baseUrl)
   }
 
   private parseMangaCards(text: string): PartialSourceManga[] {
@@ -187,6 +227,20 @@ export class PoseidonScansParser {
     }
 
     return results
+  }
+
+  private parseSerializedArray(text: string, field: string): string[] {
+    const escaped = this.escapeRegExp(field)
+    const value = new RegExp(`"${escaped}":(\\[[^\\]]*\\])`).exec(text)?.[1]
+
+    if (!value) return []
+
+    try {
+      const parsed = JSON.parse(value) as unknown
+      return Array.isArray(parsed) ? parsed.filter((item): item is string => typeof item === 'string') : []
+    } catch {
+      return []
+    }
   }
 
   private extractCardImage(block: string, mangaId: string): string {
@@ -387,6 +441,39 @@ export class PoseidonScansParser {
     return Number.isFinite(rating) ? rating : undefined
   }
 
+  private seriesAdditionalInfo(html: string): Record<string, string> {
+    const info: Record<string, string> = {}
+    const type = this.extractSerializedString(html, 'type')
+    const releaseYear = this.extractSerializedNumber(html, 'releaseYear')
+    const views = this.extractSerializedNumber(html, 'viewCount')
+    const favorites = /"favorites":(\d+)/.exec(this.searchableHtml(html))?.[1]
+
+    if (type) info.Type = type
+    if (releaseYear) info.Year = releaseYear
+    if (views) info.Views = views
+    if (favorites) info.Favorites = favorites
+
+    return info
+  }
+
+  private extractSerializedString(html: string, field: string): string {
+    const escaped = this.escapeRegExp(field)
+    const value = new RegExp(`"${escaped}":(?:null|"((?:\\\\.|[^"])*)")`).exec(this.searchableHtml(html))?.[1]
+    return this.cleanText(value ?? '')
+  }
+
+  private extractSerializedNumber(html: string, field: string): string {
+    const escaped = this.escapeRegExp(field)
+    return new RegExp(`"${escaped}":(null|-?\\d+(?:\\.\\d+)?)`).exec(this.searchableHtml(html))?.[1]?.replace('null', '') ?? ''
+  }
+
+  private splitTitles(value: string): string[] {
+    return value
+      .split(/[|;,]/)
+      .map(title => this.cleanText(title))
+      .filter(title => title.length > 0)
+  }
+
   private parseDate(value: string | undefined): Date {
     if (!value) {
       return new Date()
@@ -480,14 +567,6 @@ export class PoseidonScansParser {
       .filter(part => part.length > 0)
       .map(part => part.charAt(0).toUpperCase() + part.slice(1))
       .join(' ')
-  }
-
-  private safeDecodeURIComponent(value: string): string {
-    try {
-      return decodeURIComponent(value)
-    } catch {
-      return value
-    }
   }
 
   private escapeRegExp(value: string): string {
