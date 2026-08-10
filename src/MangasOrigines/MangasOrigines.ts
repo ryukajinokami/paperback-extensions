@@ -49,7 +49,7 @@ export class MangasOrigines implements Searchable, MangaProviding, ChapterProvid
     interceptRequest: async request => {
       request.headers = {
         ...request.headers,
-        ...this.headers(request.url)
+        ...await this.headers(request.url)
       }
 
       return request
@@ -135,7 +135,9 @@ export class MangasOrigines implements Searchable, MangaProviding, ChapterProvid
   }
 
   async getCloudflareBypassRequestAsync(): Promise<Request> {
-    return App.createRequest({ url: BASE_URL, method: 'GET', headers: this.headers(BASE_URL) })
+    const url = this.parser.buildArchiveUrl('modified', 1)
+
+    return App.createRequest({ url, method: 'GET', headers: await this.headers(url) })
   }
 
   async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
@@ -255,7 +257,7 @@ export class MangasOrigines implements Searchable, MangaProviding, ChapterProvid
     const request = App.createRequest({
       url,
       method: 'GET',
-      headers: this.headers(url)
+      headers: await this.headers(url)
     })
 
     let response: Response
@@ -280,14 +282,14 @@ export class MangasOrigines implements Searchable, MangaProviding, ChapterProvid
     return response.data
   }
 
-  private headers(url: string): Request['headers'] {
+  private async headers(url: string): Promise<Request['headers']> {
     const imageRequest = /\.(?:jpg|jpeg|png|webp|gif)(?:[?#].*)?$/i.test(url)
 
     return {
       referer: `${BASE_URL}/`,
       origin: BASE_URL,
       accept: imageRequest ? 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8' : 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-      'user-agent': 'Mozilla/5.0 Paperback/0.8 MangasOrigines'
+      'user-agent': await this.requestManager.getDefaultUserAgent()
     }
   }
 }
