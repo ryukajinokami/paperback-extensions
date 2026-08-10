@@ -15,7 +15,8 @@ export const enum MangasOriginesHomeSectionId {
   Popular = 'popular',
   Trending = 'trending',
   NewSeries = 'new_series',
-  Rating = 'rating'
+  Rating = 'rating',
+  Alphabet = 'alphabet'
 }
 
 export interface MangasOriginesGenre {

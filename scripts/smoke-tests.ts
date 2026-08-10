@@ -97,8 +97,63 @@ async function main(): Promise<void> {
     new PoseidonScansParser('https://epsilonsoft.to', 'Epsilon Soft').parseMangaList(html, 1).results.length)
   await probeProtectedSource('Astral Manga', 'https://astral-manga.fr/catalog', html =>
     new AstralMangaParser('https://astral-manga.fr').parseMangaList(html, 1).results.length)
-  await probeProtectedSource('Mangas Origines', 'https://mangas-origines.fr/catalogues/', html =>
-    new MangasOriginesParser('https://mangas-origines.fr').parseMangaList(html, 1).results.length)
+  await auditMangasOrigines()
+}
+
+async function auditMangasOrigines(): Promise<void> {
+  const baseUrl = 'https://mangas-origines.fr'
+  const parser = new MangasOriginesParser(baseUrl)
+  const cataloguePageRequest = await fetch(`${baseUrl}/catalogues/`, { headers: liveHeaders() })
+  const cataloguePage = await cataloguePageRequest.text()
+  if (cataloguePageRequest.status === 403 && /cloudflare|cf-chl|attention required|just a moment/i.test(cataloguePage)) {
+    console.log('Mangas Origines: Cloudflare challenge active, live parser check skipped')
+    return
+  }
+  if (!cataloguePageRequest.ok) throw new Error(`Mangas Origines: catalogue HTTP ${cataloguePageRequest.status}`)
+  const tags = parser.parseSearchTags(cataloguePage)
+  const body = new URLSearchParams({
+    action: 'madara_child_catalogue', s: 'volcanic', genres: '', statut: 'tous', note: '0', origine: '',
+    tri: 'recents', chmin: '0', chmax: '0', page: '1', auteur: '', artiste: '', annee: ''
+  })
+  const catalogueRequest = await fetch(`${baseUrl}/wp-admin/admin-ajax.php?paperback=1`, {
+    method: 'POST',
+    headers: {
+      ...liveHeaders(`${baseUrl}/catalogues/`, 'application/json, text/javascript, */*; q=0.01'),
+      'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+      'x-requested-with': 'XMLHttpRequest'
+    },
+    body
+  })
+  if (!catalogueRequest.ok) throw new Error(`Mangas Origines: catalogue HTTP ${catalogueRequest.status}`)
+  const catalogueResponse = JSON.parse(await catalogueRequest.text()) as {
+    success?: boolean
+    data?: { html?: string, more?: boolean }
+  }
+  const catalogue = parser.parseMangaList(catalogueResponse.data?.html ?? '', 1)
+  const mangaId = catalogue.results[0]?.mangaId
+
+  if (!catalogueResponse.success || !mangaId || (tags[0]?.tags.length ?? 0) === 0) {
+    throw new Error('Mangas Origines: catalogue AJAX, search or filters are empty')
+  }
+
+  const seriesHtml = await request(parser.buildSeriesUrl(mangaId))
+  const info = parser.parseMangaDetails(mangaId, seriesHtml)
+  const chapters = parser.parseChapterRange(mangaId, seriesHtml)
+  const latestChapter = chapters.at(-1)
+
+  if (!latestChapter || info.titles.length === 0 || info.author === 'Unknown' || info.tags[0]?.tags.length === 0) {
+    throw new Error('Mangas Origines: metadata or chapter fallback is empty')
+  }
+
+  const readerHtml = await request(parser.buildChapterUrl(mangaId, latestChapter.id))
+  const details = parser.parseChapterDetails(mangaId, latestChapter.id, readerHtml)
+  const imageResponse = await fetch(details.pages[0] ?? '', { headers: liveHeaders(parser.buildChapterUrl(mangaId, latestChapter.id)) })
+
+  if (!imageResponse.ok || details.pages.length === 0) {
+    throw new Error('Mangas Origines: reader image is unavailable')
+  }
+
+  console.log(`Mangas Origines: ${catalogue.results.length} search entries, ${tags[0]?.tags.length ?? 0} genres, ${chapters.length} fallback chapters, ${details.pages.length} reader pages`)
 }
 
 async function probeProtectedSource(name: string, url: string, parse: (html: string) => number): Promise<void> {
@@ -116,15 +171,20 @@ async function probeProtectedSource(name: string, url: string, parse: (html: str
 
 async function request(url: string): Promise<string> {
   const response = await fetch(url, {
-    headers: {
-      accept: url.includes('api.omegascans.org') ? 'application/json' : 'text/html',
-      'accept-language': 'fr-FR,fr;q=0.9,en;q=0.8',
-      'user-agent': 'Mozilla/5.0 Paperback source smoke test'
-    }
+    headers: liveHeaders(undefined, url.includes('api.omegascans.org') ? 'application/json' : 'text/html')
   })
 
   if (!response.ok) throw new Error(`HTTP ${response.status} for ${url}`)
   return response.text()
+}
+
+function liveHeaders(referer?: string, accept = 'text/html'): Record<string, string> {
+  return {
+    accept,
+    'accept-language': 'fr-FR,fr;q=0.9,en;q=0.8',
+    'user-agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1',
+    ...(referer ? { referer } : {})
+  }
 }
 
 void main().catch(error => {

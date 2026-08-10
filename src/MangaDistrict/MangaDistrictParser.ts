@@ -44,12 +44,12 @@ export class MangaDistrictParser {
     const alternativeTitles = this.splitTitles(this.extractLabeledSummary(html, 'Alternative'))
     const cover = this.extractCover(html)
     const genres = this.parseGenresFromDetails(html)
-    const status = this.extractLabeledSummary(html, 'Status') || 'Unknown'
+    const status = this.extractLabeledSummary(html, 'Status') || this.extractModernInfo(html, 'Statut') || 'Unknown'
 
     return App.createMangaInfo({
       image: cover,
       titles: Array.from(new Set([title, ...alternativeTitles])),
-      author: this.extractNamedContent(html, 'author-content') || 'Unknown',
+      author: this.extractNamedContent(html, 'author-content') || this.extractModernAuthor(html) || 'Unknown',
       artist: this.extractNamedContent(html, 'artist-content') || 'Unknown',
       desc: this.extractDescription(html),
       status,
@@ -101,7 +101,10 @@ export class MangaDistrictParser {
       }
 
       seen[chapterId] = true
-      const name = this.cleanHtml(match[3] ?? '') || this.titleFromSlug(chapterId)
+      const rawName = this.cleanHtml(match[3] ?? '') || this.titleFromSlug(chapterId)
+      const name = /^\d+(?:\.\d+)?$/.test(rawName)
+        ? `${this.options.langCode === 'fr' ? 'Chapitre' : 'Chapter'} ${rawName}`
+        : rawName
       const chapNum = this.chapterNumber(chapterId, name)
 
       chapters.push(App.createChapter({
@@ -116,6 +119,37 @@ export class MangaDistrictParser {
     }
 
     return chapters.sort((left, right) => left.chapNum - right.chapNum)
+  }
+
+  parseChapterRange(mangaId: string, html: string): Chapter[] {
+    const visibleChapters = this.parseChapters(mangaId, html)
+    const highestChapter = visibleChapters.reduce((highest, chapter) => Math.max(highest, Math.floor(chapter.chapNum)), 0)
+
+    if (highestChapter <= 0) {
+      return visibleChapters
+    }
+
+    const prefix = visibleChapters.find(chapter => /^chap(?:ter|itre)-/i.test(chapter.id))?.id.split(/\d/)[0] ?? 'chapter-'
+    const seen = new Set(visibleChapters.map(chapter => chapter.id))
+
+    for (let chapterNumber = 1; chapterNumber <= highestChapter; chapterNumber += 1) {
+      const chapterId = `${prefix}${chapterNumber}`
+      if (seen.has(chapterId)) {
+        continue
+      }
+
+      visibleChapters.push(App.createChapter({
+        id: chapterId,
+        chapNum: chapterNumber,
+        name: `${this.options.langCode === 'fr' ? 'Chapitre' : 'Chapter'} ${chapterNumber}`,
+        langCode: this.options.langCode,
+        group: this.options.sourceName,
+        time: new Date(),
+        sortingIndex: chapterNumber
+      }))
+    }
+
+    return visibleChapters.sort((left, right) => left.chapNum - right.chapNum)
   }
 
   parseChapterDetails(mangaId: string, chapterId: string, html: string): ChapterDetails {
@@ -148,6 +182,16 @@ export class MangaDistrictParser {
 
       const existing = seen[id]
       if (!existing || this.isAllCaps(existing.label) && !this.isAllCaps(label)) {
+        seen[id] = { id, label }
+      }
+    }
+
+    const modernTagPattern = /<label[^>]+class=["'][^"']*ori-fcheck[^"']*["'][^>]*>[\s\S]*?<input[^>]+value=["']([^"']+)["'][^>]*>[\s\S]*?<span[^>]+class=["'][^"']*ori-flabel[^"']*["'][^>]*>([\s\S]*?)<\/span>[\s\S]*?<\/label>/gi
+    while ((match = modernTagPattern.exec(html)) !== null) {
+      const id = this.cleanText(match[1] ?? '')
+      const label = this.cleanHtml(match[2] ?? '')
+
+      if (id.length > 0 && label.length > 0) {
         seen[id] = { id, label }
       }
     }
@@ -205,7 +249,7 @@ export class MangaDistrictParser {
   }
 
   buildChaptersUrl(mangaId: string, page = 1): string {
-    return `${this.buildSeriesUrl(mangaId)}ajax/chapters/?t=${page}`
+    return `${this.buildSeriesUrl(mangaId)}ajax/chapters/?t=${page}&paperback=1`
   }
 
   mangaIdFromUrl(url: string): string | undefined {
@@ -245,6 +289,19 @@ export class MangaDistrictParser {
         image,
         subtitle
       }))
+    }
+
+    if (results.length === 0) {
+      const canonical = /<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)["'][^>]*>/i.exec(html)?.[1] ?? ''
+      const mangaId = this.mangaIdFromUrl(this.normalizeUrl(canonical))
+
+      if (mangaId) {
+        results.push(App.createPartialSourceManga({
+          mangaId,
+          title: this.extractSeriesTitle(html) || this.titleFromSlug(mangaId),
+          image: this.extractCover(html)
+        }))
+      }
     }
 
     return results
@@ -331,12 +388,19 @@ export class MangaDistrictParser {
       return this.cleanHtml(description[1])
     }
 
+    const modernDescription = /<div[^>]+class=["'][^"']*ori-sr-syn-texte[^"']*["'][^>]*>([\s\S]*?)<\/div>/i.exec(html)
+    if (modernDescription?.[1]) {
+      return this.cleanHtml(modernDescription[1])
+    }
+
     const metaDescription = /<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["'][^>]*>/i.exec(html)
     return this.cleanText(metaDescription?.[1] ?? '')
   }
 
   private parseGenresFromDetails(html: string): MangaDistrictGenre[] {
-    const genresBlock = /<div[^>]+class=["'][^"']*genres-content[^"']*["'][^>]*>([\s\S]*?)<\/div>/i.exec(html)?.[1] ?? ''
+    const genresBlock = /<div[^>]+class=["'][^"']*genres-content[^"']*["'][^>]*>([\s\S]*?)<\/div>/i.exec(html)?.[1]
+      ?? /<div[^>]+class=["'][^"']*ori-sr-genres[^"']*["'][^>]*>([\s\S]*?)<\/div>/i.exec(html)?.[1]
+      ?? ''
     const genres: MangaDistrictGenre[] = []
     const genrePath = this.escapeRegExp(this.options.genrePath)
     const genrePattern = new RegExp("<a[^>]+href=[\"'][^\"']*/" + genrePath + "/([^/\"'#?]+)/?[\"'][^>]*>([\\s\\S]*?)<\\/a>", 'gi')
@@ -374,12 +438,24 @@ export class MangaDistrictParser {
     return Number.isFinite(rating) ? rating : undefined
   }
 
+  private extractModernAuthor(html: string): string {
+    const signature = /<div[^>]+class=["'][^"']*ori-sr-signature[^"']*["'][^>]*>([\s\S]*?)<\/div>/i.exec(html)
+    return this.cleanHtml(signature?.[1] ?? '')
+  }
+
+  private extractModernInfo(html: string, label: string): string {
+    const escaped = this.escapeRegExp(label)
+    const match = new RegExp(`<dt>\\s*${escaped}\\s*<\\/dt>\\s*<dd>([\\s\\S]*?)<\\/dd>`, 'i').exec(html)
+    return this.cleanHtml(match?.[1] ?? '')
+  }
+
   private seriesAdditionalInfo(html: string): Record<string, string> {
     const info: Record<string, string> = {}
     const fields = ['Type', 'Release', 'Status']
 
     for (const field of fields) {
-      const value = this.extractLabeledSummary(html, field)
+      const modernLabel = field === 'Status' ? 'Statut' : field
+      const value = this.extractLabeledSummary(html, field) || this.extractModernInfo(html, modernLabel)
       if (value.length > 0) info[field] = value
     }
 

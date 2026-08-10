@@ -4,6 +4,7 @@ import { MangaDistrictParser } from '../src/MangaDistrict/MangaDistrictParser'
 import { LelMangaParser } from '../src/LelManga/LelMangaParser'
 import { AstralMangaParser } from '../src/AstralManga/AstralMangaParser'
 import { MangasOriginesParser } from '../src/MangasOrigines/MangasOriginesParser'
+import { MangasOrigines } from '../src/MangasOrigines/MangasOrigines'
 import { OmegaScansParser } from '../src/OmegaScans/OmegaScansParser'
 import { PoseidonScansParser } from '../src/PoseidonScans/PoseidonScansParser'
 import { createReaderError } from '../src/utils/readerError'
@@ -18,6 +19,14 @@ const identity = <T>(value: T): T => value
   createMangaInfo: identity,
   createPagedResults: identity,
   createPartialSourceManga: identity,
+  createRequest: identity,
+  createRequestManager: (info: Record<string, unknown>) => ({
+    ...info,
+    requestsPerSecond: 1,
+    requestTimeout: 20000,
+    getDefaultUserAgent: async () => 'Paperback Test',
+    schedule: async () => { throw new Error('Unexpected request') }
+  }),
   createTag: identity,
   createTagSection: identity
 }
@@ -199,22 +208,69 @@ test('Mangas Origines supports its customized Madara routes and WordPress reader
     </a>
   </div>`
   const chapters = `<div class="ori-chl-row">
+    <a class="ori-chl-lire" href="https://mangas-origines.fr/oeuvre/example/chapitre-1/">Chapitre 1</a>
     <a class="ori-chl-lire" href="https://mangas-origines.fr/oeuvre/example/chapitre-12/">Chapitre 12</a>
   </div>`
+  const series = `<link rel="canonical" href="https://mangas-origines.fr/oeuvre/example/">
+    <meta property="og:image" content="https://mangas-origines.fr/wp-content/uploads/example.webp">
+    <div class="post-title"><h1>Example</h1></div>
+    <div class="ori-sr-signature"><a>Example Author</a></div>
+    <div class="ori-sr-genres"><a href="https://mangas-origines.fr/manga-genres/action/">Action</a></div>
+    <div class="ori-sr-infos"><dl><dt>Statut</dt><dd>En cours</dd><dt>Type</dt><dd>Manhwa</dd></dl></div>
+    <div class="ori-sr-syn-texte"><p>Modern synopsis.</p></div>`
+  const filters = '<label class="ori-fcheck"><input type="checkbox" value="action"><span class="ori-flabel">Action</span></label>'
   const reader = '<div class="reading-content"><img class="wp-manga-chapter-img" data-src="https://mangas-origines.fr/wp-content/uploads/example/chapter-1/001.webp"></div>'
   const results = parser.parseMangaList(catalogue, 1)
   const chapterResults = parser.parseChapters('example', chapters)
+  const chapterFallback = parser.parseChapterRange('example', chapters)
+  const redirectedSearch = parser.parseMangaList(series, 1)
+  const info = parser.parseMangaDetails('example', series)
+  const tags = parser.parseSearchTags(filters)
   const details = parser.parseChapterDetails('example', 'chapter-1', reader)
   assert.equal(results.results[0]?.mangaId, 'example')
   assert.equal(results.results[0]?.title, 'Example & Test')
   assert.equal(results.results[0]?.subtitle, 'Action · Manhwa')
   assert.equal(results.results[0]?.image, 'https://mangas-origines.fr/wp-content/uploads/example.webp')
-  assert.equal(chapterResults[0]?.id, 'chapitre-12')
-  assert.equal(chapterResults[0]?.chapNum, 12)
+  assert.equal(chapterResults.at(-1)?.id, 'chapitre-12')
+  assert.equal(chapterResults.at(-1)?.chapNum, 12)
+  assert.equal(chapterFallback.length, 12)
+  assert.equal(redirectedSearch.results[0]?.mangaId, 'example')
+  assert.equal(info.author, 'Example Author')
+  assert.equal(info.status, 'En cours')
+  assert.equal(info.desc, 'Modern synopsis.')
+  assert.equal(info.tags[0]?.tags[0]?.id, 'action')
+  assert.equal(info.additionalInfo.Type, 'Manhwa')
+  assert.equal(tags[0]?.tags[0]?.id, 'action')
   assert.deepEqual(details.pages, ['https://mangas-origines.fr/wp-content/uploads/example/chapter-1/001.webp'])
   assert.equal(parser.buildArchiveUrl('modified', 1), 'https://mangas-origines.fr/catalogues/?m_orderby=modified')
   assert.equal(parser.buildChapterUrl('example', 'chapter-1'), 'https://mangas-origines.fr/oeuvre/example/chapter-1/')
-  assert.equal(parser.buildChaptersUrl('example'), 'https://mangas-origines.fr/oeuvre/example/ajax/chapters/?t=1')
+  assert.equal(parser.buildChaptersUrl('example'), 'https://mangas-origines.fr/oeuvre/example/ajax/chapters/?t=1&paperback=1')
+})
+
+test('Mangas Origines sends catalogue filters through the marked AJAX endpoint', async () => {
+  const source = new MangasOrigines()
+  const requests: Array<{ url: string, method: string, data: Record<string, unknown> }> = []
+  const html = '<a class="ori-card ori-cat-card" href="https://mangas-origines.fr/oeuvre/volcanic-age/"><img src="/cover.webp" alt="Volcanic Age"><span class="ori-card-title">Volcanic Age</span></a>'
+
+  ;(source.requestManager as unknown as { schedule: (request: typeof requests[number]) => Promise<unknown> }).schedule = async request => {
+    requests.push(request)
+    return { status: 200, data: JSON.stringify({ success: true, data: { html, more: false } }), headers: {}, request }
+  }
+
+  const results = await source.getSearchResults({
+    title: 'volcanic',
+    includedTags: [{ id: 'action', label: 'Action' }],
+    excludedTags: [],
+    parameters: { orderBy: 'rating' }
+  }, undefined)
+
+  assert.equal(results.results[0]?.mangaId, 'volcanic-age')
+  assert.equal(requests[0]?.url, 'https://mangas-origines.fr/wp-admin/admin-ajax.php?paperback=1')
+  assert.equal(requests[0]?.method, 'POST')
+  assert.equal(requests[0]?.data.action, 'madara_child_catalogue')
+  assert.equal(requests[0]?.data.s, 'volcanic')
+  assert.equal(requests[0]?.data.genres, 'action')
+  assert.equal(requests[0]?.data.tri, 'notes')
 })
 
 test('Astral Manga parses UUID routes and selects the chapter image directory', () => {

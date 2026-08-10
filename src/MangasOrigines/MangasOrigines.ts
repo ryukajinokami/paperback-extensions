@@ -28,6 +28,15 @@ import { BUILD_VERSION } from './version'
 import { isCloudflareChallenge } from '../utils/cloudflare'
 
 const BASE_URL = 'https://mangas-origines.fr'
+const AJAX_URL = `${BASE_URL}/wp-admin/admin-ajax.php?paperback=1`
+
+interface CatalogueResponse {
+  success?: boolean
+  data?: {
+    html?: string
+    more?: boolean
+  }
+}
 
 export const MangasOriginesInfo: SourceInfo = {
   name: 'Mangas Origines',
@@ -49,8 +58,8 @@ export class MangasOrigines implements Searchable, MangaProviding, ChapterProvid
   private readonly interceptor: SourceInterceptor = {
     interceptRequest: async request => {
       request.headers = {
-        ...request.headers,
-        ...await this.headers(request.url)
+        ...await this.headers(request.url),
+        ...request.headers
       }
 
       return request
@@ -68,13 +77,9 @@ export class MangasOrigines implements Searchable, MangaProviding, ChapterProvid
 
   async getSearchResults(query: SearchRequest, metadata: unknown | undefined): Promise<PagedResults> {
     const page = (metadata as MangasOriginesSearchMetadata | undefined)?.page ?? 1
-    const orderBy = this.normalizeOrderBy((query.parameters as MangasOriginesSearchParameters).orderBy, query.title?.trim().length ? 'relevance' : 'modified')
+    const orderBy = this.normalizeOrderBy((query.parameters as MangasOriginesSearchParameters | undefined)?.orderBy, query.title?.trim().length ? 'relevance' : 'modified')
     const includedTagIds = query.includedTags.map(tag => tag.id)
-    const url = query.title?.trim()
-      ? this.parser.buildSearchUrl(query.title.trim(), page, orderBy, includedTagIds)
-      : this.parser.buildArchiveUrl(orderBy, page, includedTagIds)
-    const html = await this.requestText(url)
-    const results = this.parser.parseMangaList(html, page)
+    const results = await this.getCataloguePage(orderBy, page, query.title?.trim() ?? '', includedTagIds)
 
     if (query.excludedTags.length === 0) {
       return results
@@ -120,12 +125,24 @@ export class MangasOrigines implements Searchable, MangaProviding, ChapterProvid
   }
 
   async getChapters(mangaId: string): Promise<Chapter[]> {
-    const html = await this.requestText(this.parser.buildChaptersUrl(mangaId), 'POST', {
-      'x-requested-with': 'XMLHttpRequest',
-      'content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
-    })
+    try {
+      const html = await this.requestText(this.parser.buildChaptersUrl(mangaId), 'POST', {
+        'x-requested-with': 'XMLHttpRequest',
+        'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        referer: this.parser.buildSeriesUrl(mangaId)
+      }, { paperback: 1 })
 
-    return this.parser.parseChapters(mangaId, html)
+      const chapters = this.parser.parseChapters(mangaId, html)
+      if (chapters.length > 0) {
+        return chapters
+      }
+    } catch (error) {
+      console.log(`MangasOrigines chapter AJAX failed for ${mangaId}, using series fallback: ${String(error)}`)
+    }
+
+    const seriesHtml = await this.requestText(this.parser.buildSeriesUrl(mangaId))
+
+    return this.parser.parseChapterRange(mangaId, seriesHtml)
   }
 
   async getChapterDetails(mangaId: string, chapterId: string): Promise<ChapterDetails> {
@@ -161,22 +178,15 @@ export class MangasOrigines implements Searchable, MangaProviding, ChapterProvid
         containsMoreItems: true
       }),
       App.createHomeSection({
-        id: MangasOriginesHomeSectionId.Trending,
-        title: 'Trending',
-        type: HomeSectionType.singleRowNormal,
-        items: [],
-        containsMoreItems: true
-      }),
-      App.createHomeSection({
-        id: MangasOriginesHomeSectionId.NewSeries,
-        title: 'New Series',
-        type: HomeSectionType.singleRowNormal,
-        items: [],
-        containsMoreItems: true
-      }),
-      App.createHomeSection({
         id: MangasOriginesHomeSectionId.Rating,
         title: 'Highest Rated',
+        type: HomeSectionType.singleRowNormal,
+        items: [],
+        containsMoreItems: true
+      }),
+      App.createHomeSection({
+        id: MangasOriginesHomeSectionId.Alphabet,
+        title: 'A-Z',
         type: HomeSectionType.singleRowNormal,
         items: [],
         containsMoreItems: true
@@ -213,15 +223,70 @@ export class MangasOrigines implements Searchable, MangaProviding, ChapterProvid
         return this.getArchivePage('new-manga', page)
       case MangasOriginesHomeSectionId.Rating:
         return this.getArchivePage('rating', page)
+      case MangasOriginesHomeSectionId.Alphabet:
+        return this.getArchivePage('alphabet', page)
       default:
         return App.createPagedResults({ results: [] })
     }
   }
 
   private async getArchivePage(orderBy: string, page: number): Promise<PagedResults> {
-    const html = await this.requestText(this.parser.buildArchiveUrl(orderBy, page))
+    return this.getCataloguePage(orderBy, page)
+  }
 
-    return this.parser.parseMangaList(html, page)
+  private async getCataloguePage(orderBy: string, page: number, title = '', includedTagIds: string[] = []): Promise<PagedResults> {
+    const response = await this.requestText(AJAX_URL, 'POST', {
+      accept: 'application/json, text/javascript, */*; q=0.01',
+      'x-requested-with': 'XMLHttpRequest',
+      'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+      referer: `${BASE_URL}/catalogues/`
+    }, {
+      action: 'madara_child_catalogue',
+      s: title,
+      genres: includedTagIds.join(','),
+      statut: 'tous',
+      note: 0,
+      origine: '',
+      tri: this.catalogueSort(orderBy),
+      chmin: 0,
+      chmax: 0,
+      page,
+      auteur: '',
+      artiste: '',
+      annee: ''
+    })
+
+    let payload: CatalogueResponse
+    try {
+      payload = JSON.parse(response) as CatalogueResponse
+    } catch (error) {
+      throw new Error(`Mangas Origines returned invalid catalogue JSON: ${String(error)}`)
+    }
+
+    if (!payload.success || typeof payload.data?.html !== 'string') {
+      throw new Error('Mangas Origines catalogue request was rejected')
+    }
+
+    const parsed = this.parser.parseMangaList(payload.data.html, page)
+
+    return App.createPagedResults({
+      results: parsed.results,
+      metadata: payload.data.more ? { page: page + 1 } : undefined
+    })
+  }
+
+  private catalogueSort(orderBy: string): string {
+    switch (orderBy) {
+      case 'views':
+      case 'trending':
+        return 'populaire'
+      case 'rating':
+        return 'notes'
+      case 'alphabet':
+        return 'az'
+      default:
+        return 'recents'
+    }
   }
 
   private async excludeTaggedResults(results: PartialSourceManga[], excludedTags: Tag[]): Promise<PartialSourceManga[]> {
@@ -257,7 +322,7 @@ export class MangasOrigines implements Searchable, MangaProviding, ChapterProvid
     }
   }
 
-  private async requestText(url: string, method = 'GET', headers: Request['headers'] = {}): Promise<string> {
+  private async requestText(url: string, method = 'GET', headers: Request['headers'] = {}, data?: unknown): Promise<string> {
     const request = App.createRequest({
       url,
       method,
@@ -265,7 +330,7 @@ export class MangasOrigines implements Searchable, MangaProviding, ChapterProvid
         ...await this.headers(url),
         ...headers
       },
-      data: method === 'POST' ? '' : undefined
+      data: method === 'POST' ? data ?? {} : undefined
     })
 
     let response: Response
