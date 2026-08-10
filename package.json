@@ -19,7 +19,8 @@
     "paperback",
     "paperback-extension",
     "omegascans",
-    "mangadistrict"
+    "mangadistrict",
+    "poseidon-scans"
   ],
   "license": "MIT",
   "devDependencies": {

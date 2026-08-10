@@ -8,8 +8,9 @@ This repository targets `@paperback/types` and `@paperback/toolchain` `0.8.0-alp
 
 - Omega Scans: https://omegascans.org
 - MangaDistrict: https://mangadistrict.com
+- Poseidon Scans: https://poseidon-scans.net
 
-Both sources are marked `ADULT`.
+Omega Scans and MangaDistrict are marked `ADULT`. Poseidon Scans is marked `MATURE`.
 
 ## Support Matrix: Omega Scans
 
@@ -76,6 +77,35 @@ Notes:
 - Chapter IDs use the `chapter-*` slug from URLs like `/series/{slug}/chapter-1/`.
 - The reader parser keeps only CDN page URLs under `/publication/.../chapter-*`.
 
+## Support Matrix: Poseidon Scans
+
+Implemented:
+
+- Series search through the public Poseidon catalogue pages.
+- Paged catalogue browsing.
+- Series details: title, cover, banner, description, genres, status, author, artist and rating when exposed.
+- Public/free chapter list from series pages.
+- Filtering of restricted future/premium chapters marked as not yet free.
+- Reader pages from public chapter HTML image URLs.
+- Homepage section: catalogue.
+- Share URLs.
+- Stable manga/chapter IDs based on Poseidon slugs and numeric chapter paths.
+- Network error handling with explicit HTTP errors.
+
+Intentionally not implemented:
+
+- Login.
+- Premium chapter unlocks, shard unlocks or account-only content.
+- Account favorites, comments, notifications or ratings.
+- Genre filtering, because the public catalogue search page does not expose stable genre query parameters.
+- Native tracker implementation. Paperback/external trackers can still match by stable IDs and chapter numbers.
+
+Notes:
+
+- Poseidon Scans is a French Next.js site. Public HTML and server-rendered data can change without API versioning.
+- Chapter IDs use the number/path segment from URLs like `/serie/{slug}/chapter/{number}`.
+- The reader parser keeps only public `/api/chapters/{series}/{chapter}/{page}` image URLs and ignores previews/comments.
+
 ## Search Fields
 
 Paperback v0.8 search fields are plain text fields. Use these optional values:
@@ -90,6 +120,10 @@ Omega Scans:
 MangaDistrict:
 
 - `Order by`: `modified`, `views`, `trending`, `rating`, `new-manga`, `alphabet`, or `relevance`.
+
+Poseidon Scans:
+
+- No custom fields. Use the standard Paperback title search.
 
 ## Build
 
@@ -118,6 +152,8 @@ The build creates `bundles/`, including:
 - `bundles/OmegaScans/source.js`
 - `bundles/MangaDistrict/index.js`
 - `bundles/MangaDistrict/source.js`
+- `bundles/PoseidonScans/index.js`
+- `bundles/PoseidonScans/source.js`
 - `bundles/versioning.json`
 - `bundles/index.html`
 
@@ -145,7 +181,7 @@ Then enable GitHub Pages:
 After deployment, add this repository URL in Paperback:
 
 ```text
-https://<your-github-username>.github.io/<your-repository-name>
+https://ryukajinokami.github.io/paperback-extensions
 ```
 
 If you deploy the contents of `bundles/` under a subfolder, use that subfolder URL instead.

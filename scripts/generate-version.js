@@ -5,7 +5,8 @@ const { execSync } = require('node:child_process')
 const repoRoot = path.resolve(__dirname, '..')
 const outputPaths = [
   path.join(repoRoot, 'src', 'OmegaScans', 'version.ts'),
-  path.join(repoRoot, 'src', 'MangaDistrict', 'version.ts')
+  path.join(repoRoot, 'src', 'MangaDistrict', 'version.ts'),
+  path.join(repoRoot, 'src', 'PoseidonScans', 'version.ts')
 ]
 
 function dateParts(timeZone) {

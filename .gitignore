@@ -4,6 +4,7 @@ bundles/
 lib/
 src/OmegaScans/version.ts
 src/MangaDistrict/version.ts
+src/PoseidonScans/version.ts
 .idea/
 PaperBack.sln
 *.tgz

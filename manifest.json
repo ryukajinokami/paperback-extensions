@@ -18,6 +18,14 @@
       "websiteBaseURL": "https://mangadistrict.com",
       "contentRating": "ADULT",
       "path": "bundles/MangaDistrict/index.js"
+    },
+    {
+      "id": "PoseidonScans",
+      "name": "Poseidon Scans",
+      "version": "1.0.0",
+      "websiteBaseURL": "https://poseidon-scans.net",
+      "contentRating": "MATURE",
+      "path": "bundles/PoseidonScans/index.js"
     }
   ]
 }
