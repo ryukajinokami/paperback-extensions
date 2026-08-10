@@ -192,11 +192,19 @@ test('Epsilon-compatible parser uses the selected source name and routes', () =>
 
 test('Mangas Origines supports its customized Madara routes and WordPress reader', () => {
   const parser = new MangasOriginesParser('https://mangas-origines.fr')
-  const catalogue = '<div class="page-item-detail manga"><a href="https://mangas-origines.fr/oeuvre/example/" title="Example"><img src="https://mangas-origines.fr/wp-content/uploads/example.webp"></a></div>'
+  const catalogue = `<div class="ori-listing-grid ori-cat-grid">
+    <a class="ori-card ori-cat-card" href="https://mangas-origines.fr/oeuvre/example/">
+      <span class="ori-card-cover"><img src="https://mangas-origines.fr/wp-content/uploads/example.webp" alt="Example"></span>
+      <span class="ori-card-title">Example &amp; Test</span><span class="ori-card-sub">Action &middot; Manhwa</span>
+    </a>
+  </div>`
   const reader = '<div class="reading-content"><img class="wp-manga-chapter-img" data-src="https://mangas-origines.fr/wp-content/uploads/example/chapter-1/001.webp"></div>'
   const results = parser.parseMangaList(catalogue, 1)
   const details = parser.parseChapterDetails('example', 'chapter-1', reader)
   assert.equal(results.results[0]?.mangaId, 'example')
+  assert.equal(results.results[0]?.title, 'Example & Test')
+  assert.equal(results.results[0]?.subtitle, 'Action · Manhwa')
+  assert.equal(results.results[0]?.image, 'https://mangas-origines.fr/wp-content/uploads/example.webp')
   assert.deepEqual(details.pages, ['https://mangas-origines.fr/wp-content/uploads/example/chapter-1/001.webp'])
   assert.equal(parser.buildArchiveUrl('modified', 1), 'https://mangas-origines.fr/catalogues/?m_orderby=modified')
   assert.equal(parser.buildChapterUrl('example', 'chapter-1'), 'https://mangas-origines.fr/oeuvre/example/chapter-1/')

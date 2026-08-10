@@ -191,7 +191,9 @@ export class MangaDistrictParser {
   }
 
   private parseMangaCards(html: string): PartialSourceManga[] {
-    const blocks = html.split(/<div[^>]+class=["'][^"']*page-item-detail[^"']*manga[^"']*["'][^>]*>/i).slice(1)
+    const legacyBlocks = html.split(/<div[^>]+class=["'][^"']*page-item-detail[^"']*manga[^"']*["'][^>]*>/i).slice(1)
+    const modernBlocks = html.match(/<a[^>]+class=["'][^"']*ori-cat-card[^"']*["'][^>]*>[\s\S]*?<\/a>/gi) ?? []
+    const blocks = [...legacyBlocks, ...modernBlocks]
     const seen: Record<string, boolean> = {}
     const results: PartialSourceManga[] = []
 
@@ -227,6 +229,11 @@ export class MangaDistrictParser {
   }
 
   private extractCardTitle(block: string): string {
+    const modernTitle = /<span[^>]+class=["'][^"']*ori-card-title[^"']*["'][^>]*>([\s\S]*?)<\/span>/i.exec(block)
+    if (modernTitle?.[1]) {
+      return this.cleanHtml(modernTitle[1])
+    }
+
     const titleAnchor = /<div[^>]+class=["'][^"']*post-title[^"']*["'][\s\S]*?<a[^>]*>([\s\S]*?)<\/a>/i.exec(block)
     if (titleAnchor?.[1]) {
       return this.cleanHtml(titleAnchor[1])
@@ -248,6 +255,11 @@ export class MangaDistrictParser {
   }
 
   private extractCardSubtitle(block: string): string | undefined {
+    const modernSubtitle = /<span[^>]+class=["'][^"']*ori-card-sub[^"']*["'][^>]*>([\s\S]*?)<\/span>/i.exec(block)
+    if (modernSubtitle?.[1]) {
+      return this.cleanHtml(modernSubtitle[1])
+    }
+
     const latestChapter = /<div[^>]+class=["'][^"']*chapter-item[^"']*["'][\s\S]*?<a[^>]*>([\s\S]*?)<\/a>/i.exec(block)
     const score = /<span[^>]+class=["'][^"']*total_votes[^"']*["'][^>]*>([\s\S]*?)<\/span>/i.exec(block)
     const parts = [
@@ -537,6 +549,7 @@ export class MangaDistrictParser {
       .replace(/&ldquo;/g, '"')
       .replace(/&rdquo;/g, '"')
       .replace(/&hellip;/g, '...')
+      .replace(/&middot;/g, '\u00b7')
       .replace(/&nbsp;/g, ' ')
       .replace(/&lt;/g, '<')
       .replace(/&gt;/g, '>')
