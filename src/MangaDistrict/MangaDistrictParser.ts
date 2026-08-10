@@ -91,6 +91,30 @@ export class MangaDistrictParser {
       }))
     }
 
+    const escapedMangaId = this.escapeRegExp(encodeURIComponent(mangaId))
+    const modernChapterPattern = new RegExp(`<a[^>]+href=["']([^"']*/${this.escapeRegExp(this.options.seriesPath)}/${escapedMangaId}/([^/"'#?]+)/?)["'][^>]*>([\\s\\S]*?)<\\/a>`, 'gi')
+
+    while ((match = modernChapterPattern.exec(html)) !== null) {
+      const chapterId = this.decodeText(match[2] ?? '')
+      if (!/^chap(?:ter|itre)-/i.test(chapterId) || seen[chapterId]) {
+        continue
+      }
+
+      seen[chapterId] = true
+      const name = this.cleanHtml(match[3] ?? '') || this.titleFromSlug(chapterId)
+      const chapNum = this.chapterNumber(chapterId, name)
+
+      chapters.push(App.createChapter({
+        id: chapterId,
+        chapNum,
+        name,
+        langCode: this.options.langCode,
+        group: this.options.sourceName,
+        time: new Date(),
+        sortingIndex: chapNum
+      }))
+    }
+
     return chapters.sort((left, right) => left.chapNum - right.chapNum)
   }
 
@@ -178,6 +202,10 @@ export class MangaDistrictParser {
 
   buildChapterUrl(mangaId: string, chapterId: string): string {
     return `${this.buildSeriesUrl(mangaId)}${encodeURIComponent(chapterId)}/`
+  }
+
+  buildChaptersUrl(mangaId: string, page = 1): string {
+    return `${this.buildSeriesUrl(mangaId)}ajax/chapters/?t=${page}`
   }
 
   mangaIdFromUrl(url: string): string | undefined {
@@ -451,7 +479,7 @@ export class MangaDistrictParser {
       return Number(titleMatch[1])
     }
 
-    const slugMatch = /chapter-(\d+(?:-\d+)?)/i.exec(chapterId)
+    const slugMatch = /chap(?:ter|itre)-(\d+(?:-\d+)?)/i.exec(chapterId)
     if (!slugMatch?.[1]) {
       return 0
     }

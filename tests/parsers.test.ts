@@ -198,16 +198,23 @@ test('Mangas Origines supports its customized Madara routes and WordPress reader
       <span class="ori-card-title">Example &amp; Test</span><span class="ori-card-sub">Action &middot; Manhwa</span>
     </a>
   </div>`
+  const chapters = `<div class="ori-chl-row">
+    <a class="ori-chl-lire" href="https://mangas-origines.fr/oeuvre/example/chapitre-12/">Chapitre 12</a>
+  </div>`
   const reader = '<div class="reading-content"><img class="wp-manga-chapter-img" data-src="https://mangas-origines.fr/wp-content/uploads/example/chapter-1/001.webp"></div>'
   const results = parser.parseMangaList(catalogue, 1)
+  const chapterResults = parser.parseChapters('example', chapters)
   const details = parser.parseChapterDetails('example', 'chapter-1', reader)
   assert.equal(results.results[0]?.mangaId, 'example')
   assert.equal(results.results[0]?.title, 'Example & Test')
   assert.equal(results.results[0]?.subtitle, 'Action · Manhwa')
   assert.equal(results.results[0]?.image, 'https://mangas-origines.fr/wp-content/uploads/example.webp')
+  assert.equal(chapterResults[0]?.id, 'chapitre-12')
+  assert.equal(chapterResults[0]?.chapNum, 12)
   assert.deepEqual(details.pages, ['https://mangas-origines.fr/wp-content/uploads/example/chapter-1/001.webp'])
   assert.equal(parser.buildArchiveUrl('modified', 1), 'https://mangas-origines.fr/catalogues/?m_orderby=modified')
   assert.equal(parser.buildChapterUrl('example', 'chapter-1'), 'https://mangas-origines.fr/oeuvre/example/chapter-1/')
+  assert.equal(parser.buildChaptersUrl('example'), 'https://mangas-origines.fr/oeuvre/example/ajax/chapters/?t=1')
 })
 
 test('Astral Manga parses UUID routes and selects the chapter image directory', () => {

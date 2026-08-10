@@ -120,7 +120,10 @@ export class MangasOrigines implements Searchable, MangaProviding, ChapterProvid
   }
 
   async getChapters(mangaId: string): Promise<Chapter[]> {
-    const html = await this.requestText(this.parser.buildSeriesUrl(mangaId))
+    const html = await this.requestText(this.parser.buildChaptersUrl(mangaId), 'POST', {
+      'x-requested-with': 'XMLHttpRequest',
+      'content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
+    })
 
     return this.parser.parseChapters(mangaId, html)
   }
@@ -254,11 +257,15 @@ export class MangasOrigines implements Searchable, MangaProviding, ChapterProvid
     }
   }
 
-  private async requestText(url: string): Promise<string> {
+  private async requestText(url: string, method = 'GET', headers: Request['headers'] = {}): Promise<string> {
     const request = App.createRequest({
       url,
-      method: 'GET',
-      headers: await this.headers(url)
+      method,
+      headers: {
+        ...await this.headers(url),
+        ...headers
+      },
+      data: method === 'POST' ? '' : undefined
     })
 
     let response: Response
