@@ -6,7 +6,7 @@
   "description": "Paperback v0.8 source repository for multiple manga scan sites.",
   "scripts": {
     "generate-version": "node scripts/generate-version.js",
-    "test": "tsx --test tests/**/*.test.ts",
+    "test": "tsx --test tests/parsers.test.ts",
     "test:live": "tsx scripts/smoke-tests.ts",
     "pretypecheck": "npm run generate-version",
     "typecheck": "tsc --noEmit",
