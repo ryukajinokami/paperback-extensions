@@ -34,6 +34,30 @@
       "websiteBaseURL": "https://www.lelmanga.com",
       "contentRating": "MATURE",
       "path": "bundles/LelManga/index.js"
+    },
+    {
+      "id": "EpsilonSoft",
+      "name": "Epsilon Soft",
+      "version": "1.0.0",
+      "websiteBaseURL": "https://epsilonsoft.to",
+      "contentRating": "MATURE",
+      "path": "bundles/EpsilonSoft/index.js"
+    },
+    {
+      "id": "AstralManga",
+      "name": "Astral Manga",
+      "version": "1.0.0",
+      "websiteBaseURL": "https://astral-manga.fr",
+      "contentRating": "ADULT",
+      "path": "bundles/AstralManga/index.js"
+    },
+    {
+      "id": "MangasOrigines",
+      "name": "Mangas Origines",
+      "version": "1.0.0",
+      "websiteBaseURL": "https://mangas-origines.fr",
+      "contentRating": "ADULT",
+      "path": "bundles/MangasOrigines/index.js"
     }
   ]
 }

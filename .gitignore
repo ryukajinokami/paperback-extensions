@@ -6,6 +6,9 @@ src/OmegaScans/version.ts
 src/MangaDistrict/version.ts
 src/PoseidonScans/version.ts
 src/LelManga/version.ts
+src/EpsilonSoft/version.ts
+src/AstralManga/version.ts
+src/MangasOrigines/version.ts
 .idea/
 PaperBack.sln
 *.tgz

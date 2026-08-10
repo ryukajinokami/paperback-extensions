@@ -5,8 +5,30 @@ import { normalizeHttpUrl } from '../utils/url'
 
 const CARD_PAGE_SIZE = 30
 
+export interface MadaraParserOptions {
+  archivePath?: string
+  seriesPath?: string
+  genrePath?: string
+  sourceName?: string
+  langCode?: string
+  hentai?: boolean
+  acceptWordPressReaderImages?: boolean
+}
+
 export class MangaDistrictParser {
-  constructor(private readonly baseUrl: string) {}
+  private readonly options: Required<MadaraParserOptions>
+
+  constructor(private readonly baseUrl: string, options: MadaraParserOptions = {}) {
+    this.options = {
+      archivePath: options.archivePath ?? 'series',
+      seriesPath: options.seriesPath ?? 'series',
+      genrePath: options.genrePath ?? 'publication-genre',
+      sourceName: options.sourceName ?? 'MangaDistrict',
+      langCode: options.langCode ?? 'en',
+      hentai: options.hentai ?? true,
+      acceptWordPressReaderImages: options.acceptWordPressReaderImages ?? false
+    }
+  }
 
   parseMangaList(html: string, page: number): PagedResults {
     const results = this.parseMangaCards(html)
@@ -31,7 +53,7 @@ export class MangaDistrictParser {
       artist: this.extractNamedContent(html, 'artist-content') || 'Unknown',
       desc: this.extractDescription(html),
       status,
-      hentai: true,
+      hentai: this.options.hentai,
       rating: this.extractRating(html),
       tags: [this.toTagSection(genres)],
       covers: cover.length > 0 ? [cover] : [],
@@ -62,8 +84,8 @@ export class MangaDistrictParser {
         id: chapterId,
         chapNum,
         name,
-        langCode: 'en',
-        group: 'MangaDistrict',
+        langCode: this.options.langCode,
+        group: this.options.sourceName,
         time: this.parseChapterDate(block),
         sortingIndex: chapNum
       }))
@@ -76,7 +98,7 @@ export class MangaDistrictParser {
     const pages = this.extractReaderImages(html)
 
     if (pages.length === 0) {
-      throw createReaderError('MangaDistrict', mangaId, chapterId, html)
+      throw createReaderError(this.options.sourceName, mangaId, chapterId, html)
     }
 
     return App.createChapterDetails({
@@ -88,7 +110,8 @@ export class MangaDistrictParser {
 
   parseSearchTags(html: string): TagSection[] {
     const seen: Record<string, MangaDistrictGenre> = {}
-    const tagPattern = /<a[^>]+href=["']https?:\/\/(?:www\.)?mangadistrict\.com\/publication-genre\/([^/"'#?]+)\/?["'][^>]*>([\s\S]*?)<\/a>/gi
+    const genrePath = this.escapeRegExp(this.options.genrePath)
+    const tagPattern = new RegExp(`<a[^>]+href=["'][^"']*/${genrePath}/([^/"'#?]+)/?["'][^>]*>([\\s\\S]*?)<\\/a>`, 'gi')
     let match: RegExpExecArray | null
 
     while ((match = tagPattern.exec(html)) !== null) {
@@ -141,7 +164,7 @@ export class MangaDistrictParser {
   }
 
   buildArchiveUrl(orderBy: string, page: number, includedTagIds: string[] = []): string {
-    const path = page > 1 ? `/series/page/${page}/` : '/series/'
+    const path = page > 1 ? `/${this.options.archivePath}/page/${page}/` : `/${this.options.archivePath}/`
 
     return this.buildUrl(path, [
       ['m_orderby', orderBy],
@@ -150,7 +173,7 @@ export class MangaDistrictParser {
   }
 
   buildSeriesUrl(mangaId: string): string {
-    return `${this.baseUrl}/series/${encodeURIComponent(mangaId)}/`
+    return `${this.baseUrl}/${this.options.seriesPath}/${encodeURIComponent(mangaId)}/`
   }
 
   buildChapterUrl(mangaId: string, chapterId: string): string {
@@ -158,7 +181,8 @@ export class MangaDistrictParser {
   }
 
   mangaIdFromUrl(url: string): string | undefined {
-    const match = /\/series\/([^/?#]+)\/?(?:[?#].*)?$/.exec(url)
+    const path = this.escapeRegExp(this.options.seriesPath)
+    const match = new RegExp(`/${path}/([^/?#]+)/?(?:[?#].*)?$`).exec(url)
     return match?.[1] ? this.decodeText(match[1]) : undefined
   }
 
@@ -197,7 +221,8 @@ export class MangaDistrictParser {
   }
 
   private extractSeriesHref(block: string): string {
-    const match = /<a[^>]+href=["']([^"']*\/series\/[^/"'#?]+\/?)["'][^>]*>/i.exec(block)
+    const path = this.escapeRegExp(this.options.seriesPath)
+    const match = new RegExp("<a[^>]+href=[\"']([^\"']*/" + path + "/[^/\"'#?]+/?)[\"'][^>]*>", 'i').exec(block)
     return this.normalizeUrl(match?.[1] ?? '')
   }
 
@@ -207,7 +232,8 @@ export class MangaDistrictParser {
       return this.cleanHtml(titleAnchor[1])
     }
 
-    const titleAttr = /<a[^>]+href=["'][^"']*\/series\/[^"']+["'][^>]*title=["']([^"']+)["'][^>]*>/i.exec(block)
+    const path = this.escapeRegExp(this.options.seriesPath)
+    const titleAttr = new RegExp("<a[^>]+href=[\"'][^\"']*/" + path + "/[^\"']+[\"'][^>]*title=[\"']([^\"']+)[\"'][^>]*>", 'i').exec(block)
     if (titleAttr?.[1]) {
       return this.cleanText(titleAttr[1])
     }
@@ -272,7 +298,8 @@ export class MangaDistrictParser {
   private parseGenresFromDetails(html: string): MangaDistrictGenre[] {
     const genresBlock = /<div[^>]+class=["'][^"']*genres-content[^"']*["'][^>]*>([\s\S]*?)<\/div>/i.exec(html)?.[1] ?? ''
     const genres: MangaDistrictGenre[] = []
-    const genrePattern = /<a[^>]+href=["'][^"']*\/publication-genre\/([^/"'#?]+)\/?["'][^>]*>([\s\S]*?)<\/a>/gi
+    const genrePath = this.escapeRegExp(this.options.genrePath)
+    const genrePattern = new RegExp("<a[^>]+href=[\"'][^\"']*/" + genrePath + "/([^/\"'#?]+)/?[\"'][^>]*>([\\s\\S]*?)<\\/a>", 'gi')
     let match: RegExpExecArray | null
 
     while ((match = genrePattern.exec(genresBlock)) !== null) {
@@ -385,15 +412,19 @@ export class MangaDistrictParser {
       return false
     }
 
-    if (lower.includes('/assets/publication/media/') || lower.includes('/thumbnail/') || lower.includes('/wp-content/')) {
+    if (lower.includes('/thumbnail/') || lower.includes('/logo') || lower.includes('/favicon') || lower.includes('/banner')) {
       return false
     }
+
+    if (this.options.acceptWordPressReaderImages) return lower.includes('/wp-content/uploads/')
+    if (lower.includes('/assets/publication/media/') || lower.includes('/wp-content/')) return false
 
     return lower.includes('cdn.mangadistrict.com/publication/') && lower.includes('/chapter-')
   }
 
   private chapterIdFromUrl(url: string): string | undefined {
-    const match = /\/series\/[^/]+\/([^/?#]+)\/?(?:[?#].*)?$/.exec(url)
+    const path = this.escapeRegExp(this.options.seriesPath)
+    const match = new RegExp('/' + path + '/[^/]+/([^/?#]+)/?(?:[?#].*)?$').exec(url)
     return match?.[1] ? this.decodeText(match[1]) : undefined
   }
 

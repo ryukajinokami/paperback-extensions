@@ -2,6 +2,8 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import { MangaDistrictParser } from '../src/MangaDistrict/MangaDistrictParser'
 import { LelMangaParser } from '../src/LelManga/LelMangaParser'
+import { AstralMangaParser } from '../src/AstralManga/AstralMangaParser'
+import { MangasOriginesParser } from '../src/MangasOrigines/MangasOriginesParser'
 import { OmegaScansParser } from '../src/OmegaScans/OmegaScansParser'
 import { PoseidonScansParser } from '../src/PoseidonScans/PoseidonScansParser'
 import { createReaderError } from '../src/utils/readerError'
@@ -166,4 +168,40 @@ test('LelManga parses catalogue filters, chapters, metadata and reader pages', (
     parser.buildCatalogueUrl(2, [{ id: '11', label: 'Action' }], { status: 'ongoing', order: 'popular' }, 'one piece'),
     'https://www.lelmanga.com/manga?s=one%20piece&genre%5B%5D=11&status=ongoing&order=popular&page=2'
   )
+})
+
+test('Epsilon-compatible parser uses the selected source name and routes', () => {
+  const parser = new PoseidonScansParser('https://epsilonsoft.to', 'Epsilon Soft')
+  const chapters = parser.parseChapters('regas', '<script>{"chapters":[{"id":"id","number":98,"title":null,"createdAt":"$D2026-06-27T00:00:00.000Z","isPremium":false,"premiumUntil":null}]}</script>')
+  assert.equal(chapters[0]?.group, 'Epsilon Soft')
+  assert.equal(parser.buildSeriesUrl('regas'), 'https://epsilonsoft.to/serie/regas')
+  assert.equal(parser.buildChapterUrl('regas', '98'), 'https://epsilonsoft.to/serie/regas/chapter/98')
+})
+
+test('Mangas Origines supports its customized Madara routes and WordPress reader', () => {
+  const parser = new MangasOriginesParser('https://mangas-origines.fr')
+  const catalogue = '<div class="page-item-detail manga"><a href="https://mangas-origines.fr/oeuvre/example/" title="Example"><img src="https://mangas-origines.fr/wp-content/uploads/example.webp"></a></div>'
+  const reader = '<div class="reading-content"><img class="wp-manga-chapter-img" data-src="https://mangas-origines.fr/wp-content/uploads/example/chapter-1/001.webp"></div>'
+  const results = parser.parseMangaList(catalogue, 1)
+  const details = parser.parseChapterDetails('example', 'chapter-1', reader)
+  assert.equal(results.results[0]?.mangaId, 'example')
+  assert.deepEqual(details.pages, ['https://mangas-origines.fr/wp-content/uploads/example/chapter-1/001.webp'])
+  assert.equal(parser.buildArchiveUrl('modified', 1), 'https://mangas-origines.fr/catalogues/?m_orderby=modified')
+  assert.equal(parser.buildChapterUrl('example', 'chapter-1'), 'https://mangas-origines.fr/oeuvre/example/chapter-1/')
+})
+
+test('Astral Manga parses UUID routes and selects the chapter image directory', () => {
+  const parser = new AstralMangaParser('https://astral-manga.fr')
+  const mangaId = '01b2c442-e484-4d77-a07a-c2714b718d24'
+  const chapterId = '293db8d9-6f01-4911-b6f1-045298b20c79'
+  const catalogue = `<a href="/manga/${mangaId}"><img src="/uploads/covers/example.webp" alt="Example"></a>`
+  const series = `<h1>Example</h1><a href="/manga/${mangaId}/chapter/${chapterId}">Chapitre 173</a>`
+  const reader = '<img src="/images/logo.png"><script>{"images":["/uploads/chapters/example/001.webp","/uploads/chapters/example/002.webp"],"cover":"/uploads/covers/example.webp"}</script>'
+  assert.equal(parser.parseMangaList(catalogue, 1).results[0]?.mangaId, mangaId)
+  assert.equal(parser.parseChapters(mangaId, series)[0]?.chapNum, 173)
+  assert.deepEqual(parser.parseChapterDetails(mangaId, chapterId, reader).pages, [
+    'https://astral-manga.fr/uploads/chapters/example/001.webp',
+    'https://astral-manga.fr/uploads/chapters/example/002.webp'
+  ])
+  assert.equal(parser.buildCatalogueUrl(1, '', [{ id: 'Action', label: 'Action' }]), 'https://astral-manga.fr/catalog?tags=Action')
 })

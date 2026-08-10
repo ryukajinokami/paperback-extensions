@@ -10,8 +10,11 @@ This repository targets `@paperback/types` and `@paperback/toolchain` `0.8.0-alp
 - MangaDistrict: https://mangadistrict.com
 - Poseidon Scans: https://poseidon-scans.net
 - LelManga: https://www.lelmanga.com
+- Epsilon Soft: https://epsilonsoft.to
+- Astral Manga: https://astral-manga.fr
+- Mangas Origines: https://mangas-origines.fr
 
-Omega Scans and MangaDistrict are marked `ADULT`. Poseidon Scans and LelManga are marked `MATURE`.
+Omega Scans, MangaDistrict, Astral Manga and Mangas Origines are marked `ADULT`. Poseidon Scans, LelManga and Epsilon Soft are marked `MATURE`.
 
 ## Support Matrix: Omega Scans
 
@@ -136,6 +139,29 @@ Notes:
 - LelManga is a public French WordPress/MangaReader site. Its HTML can change without API versioning.
 - Chapter IDs use their root path, for example `one-piece-1190`.
 
+## Support Matrix: Epsilon Soft
+
+- French catalogue search with genre, type, status, sorting and chapter-count filters.
+- Series metadata, free chapter lists, public reader pages and homepage sections.
+- Stable `/serie/{slug}/chapter/{number}` identifiers.
+- Premium or not-yet-public chapters are filtered from the chapter list.
+
+## Support Matrix: Astral Manga
+
+- Support for the current UUID-based `/catalog` and `/manga/{uuid}` application.
+- Search by title, tags, status and type with latest, popular and alphabetical views.
+- Series metadata, UUID chapter lists and public reader images.
+- Reader filtering groups images by chapter directory to exclude covers and recommendations.
+
+## Support Matrix: Mangas Origines
+
+- Madara catalogue search through `/catalogues` with genres and ordering.
+- Series details through `/oeuvre/{slug}`, chapter lists and public WordPress reader images.
+- Homepage sections for updates, views, trends, new series and ratings.
+- Stable series slugs and chapter path IDs.
+
+All three sites currently use Cloudflare managed challenges. The sources report an explicit HTTP 403 error when Cloudflare blocks Paperback; no challenge bypass or account automation is included.
+
 ## Search Fields
 
 Paperback v0.8 search fields are plain text fields. Use these optional values:
@@ -166,6 +192,16 @@ LelManga:
 - `Trier par`: `update`, `latest`, `popular`, `title`, or `titlereverse`.
 - Genres are available as standard Paperback search tags.
 
+Epsilon Soft uses the same French search fields documented for Poseidon Scans.
+
+Astral Manga:
+
+- `Statut`: a site status such as `En cours` or `Termine`.
+- `Type`: `Manga`, `Manhwa`, or `Manhua`.
+- `Tri`: `latest`, `popular`, or `alphabetical`.
+
+Mangas Origines uses the same Madara ordering fields documented for MangaDistrict.
+
 ## Tests
 
 Run deterministic parser regression tests:
@@ -180,7 +216,7 @@ Run optional live reader smoke tests against one public chapter from each source
 npm run test:live
 ```
 
-The live tests currently cover Omega Scans, MangaDistrict, Poseidon Scans and LelManga. They are intentionally not scheduled and are not part of the deployment workflow because external sites can be temporarily unavailable. GitHub Actions runs type checking and deterministic parser tests before building the repository.
+The live tests cover Omega Scans, MangaDistrict, Poseidon Scans and LelManga readers, plus catalogue probes for Epsilon Soft, Astral Manga and Mangas Origines. Cloudflare-protected probes are reported and skipped while a managed challenge is active. The live tests are intentionally not scheduled; GitHub Actions runs type checking and deterministic parser tests before building the repository.
 
 ## Build
 
@@ -214,6 +250,12 @@ The build creates `bundles/`, including:
 - `bundles/PoseidonScans/source.js`
 - `bundles/LelManga/index.js`
 - `bundles/LelManga/source.js`
+- `bundles/EpsilonSoft/index.js`
+- `bundles/EpsilonSoft/source.js`
+- `bundles/AstralManga/index.js`
+- `bundles/AstralManga/source.js`
+- `bundles/MangasOrigines/index.js`
+- `bundles/MangasOrigines/source.js`
 - `bundles/versioning.json`
 - `bundles/index.html`
 

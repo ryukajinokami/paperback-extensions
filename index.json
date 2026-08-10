@@ -26,6 +26,24 @@
       "name": "LelManga",
       "version": "1.0.0",
       "url": "https://<your-github-username>.github.io/<your-repository-name>/LelManga/index.js"
+    },
+    {
+      "id": "EpsilonSoft",
+      "name": "Epsilon Soft",
+      "version": "1.0.0",
+      "url": "https://<your-github-username>.github.io/<your-repository-name>/EpsilonSoft/index.js"
+    },
+    {
+      "id": "AstralManga",
+      "name": "Astral Manga",
+      "version": "1.0.0",
+      "url": "https://<your-github-username>.github.io/<your-repository-name>/AstralManga/index.js"
+    },
+    {
+      "id": "MangasOrigines",
+      "name": "Mangas Origines",
+      "version": "1.0.0",
+      "url": "https://<your-github-username>.github.io/<your-repository-name>/MangasOrigines/index.js"
     }
   ]
 }

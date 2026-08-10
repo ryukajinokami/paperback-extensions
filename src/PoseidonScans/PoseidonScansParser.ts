@@ -6,7 +6,7 @@ import { normalizeHttpUrl } from '../utils/url'
 const CATALOGUE_PAGE_SIZE = 20
 
 export class PoseidonScansParser {
-  constructor(private readonly baseUrl: string) {}
+  constructor(private readonly baseUrl: string, private readonly sourceName = 'Poseidon Scans') {}
 
   parseMangaList(html: string, page: number): PagedResults {
     const text = this.searchableHtml(html)
@@ -141,7 +141,7 @@ export class PoseidonScansParser {
     const pages = this.extractReaderImages(mangaId, html)
 
     if (pages.length === 0) {
-      throw createReaderError('Poseidon Scans', mangaId, chapterId, html)
+      throw createReaderError(this.sourceName, mangaId, chapterId, html)
     }
 
     return App.createChapterDetails({
@@ -302,7 +302,7 @@ export class PoseidonScansParser {
         chapNum,
         name: title.length > 0 ? `Chapitre ${number} - ${title}` : `Chapitre ${number}`,
         langCode: 'fr',
-        group: 'Poseidon Scans',
+        group: this.sourceName,
         time: this.parseDate(createdAt),
         sortingIndex: chapNum
       }))

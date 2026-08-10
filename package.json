@@ -23,7 +23,10 @@
     "omegascans",
     "mangadistrict",
     "poseidon-scans",
-    "lelmanga"
+    "lelmanga",
+    "epsilonsoft",
+    "astral-manga",
+    "mangas-origines"
   ],
   "license": "MIT",
   "devDependencies": {

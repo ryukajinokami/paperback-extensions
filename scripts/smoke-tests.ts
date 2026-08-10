@@ -1,5 +1,7 @@
 import { MangaDistrictParser } from '../src/MangaDistrict/MangaDistrictParser'
 import { LelMangaParser } from '../src/LelManga/LelMangaParser'
+import { AstralMangaParser } from '../src/AstralManga/AstralMangaParser'
+import { MangasOriginesParser } from '../src/MangasOrigines/MangasOriginesParser'
 import { OmegaScansParser } from '../src/OmegaScans/OmegaScansParser'
 import { PoseidonScansParser } from '../src/PoseidonScans/PoseidonScansParser'
 
@@ -90,6 +92,26 @@ async function main(): Promise<void> {
   console.log(`Series metadata: Omega ${omegaInfo.titles.length}, MangaDistrict ${districtInfo.titles.length}, Poseidon ${poseidonInfo.titles.length}, LelManga ${lelMangaInfo.titles.length} titles`)
   console.log(`Poseidon Scans: ${searchTags[0]?.tags.length ?? 0} catalogue genres`)
   console.log(`LelManga: ${lelMangaResults.results.length} catalogue entries, ${lelMangaChapters.length} chapters, ${lelMangaTags[0]?.tags.length ?? 0} genres`)
+
+  await probeProtectedSource('Epsilon Soft', 'https://epsilonsoft.to/series', html =>
+    new PoseidonScansParser('https://epsilonsoft.to', 'Epsilon Soft').parseMangaList(html, 1).results.length)
+  await probeProtectedSource('Astral Manga', 'https://astral-manga.fr/catalog', html =>
+    new AstralMangaParser('https://astral-manga.fr').parseMangaList(html, 1).results.length)
+  await probeProtectedSource('Mangas Origines', 'https://mangas-origines.fr/catalogues/', html =>
+    new MangasOriginesParser('https://mangas-origines.fr').parseMangaList(html, 1).results.length)
+}
+
+async function probeProtectedSource(name: string, url: string, parse: (html: string) => number): Promise<void> {
+  const response = await fetch(url, { headers: { 'user-agent': 'Mozilla/5.0 Paperback source smoke test' } })
+  const html = await response.text()
+  if (response.status === 403 && /cloudflare|cf-chl|just a moment|un instant/i.test(html)) {
+    console.log(`${name}: Cloudflare challenge active, live parser check skipped`)
+    return
+  }
+  if (!response.ok) throw new Error(`${name}: HTTP ${response.status} for ${url}`)
+  const count = parse(html)
+  if (count === 0) throw new Error(`${name}: live catalogue parser returned no entries`)
+  console.log(`${name}: ${count} live catalogue entries`)
 }
 
 async function request(url: string): Promise<string> {
