@@ -130,7 +130,7 @@ export class OmegaScansParser {
   }
 
   normalizeUrl(value: string): string {
-    const cleaned = this.decodeText(value.trim())
+    const cleaned = this.decodeText(value.trim()).replace(/ /g, '%20')
 
     if (cleaned.length === 0) {
       return ''
