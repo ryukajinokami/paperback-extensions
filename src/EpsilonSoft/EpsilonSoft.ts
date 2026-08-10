@@ -40,7 +40,7 @@ export const EpsilonSoftInfo: SourceInfo = {
     { text: 'Manga', type: BadgeColor.GREEN },
     { text: 'Manhwa', type: BadgeColor.GREY }
   ],
-  intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS
+  intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED
 }
 
 export class EpsilonSoft implements Searchable, MangaProviding, ChapterProviding {
@@ -135,6 +135,10 @@ export class EpsilonSoft implements Searchable, MangaProviding, ChapterProviding
 
   getMangaShareUrl(mangaId: string): string {
     return this.parser.buildSeriesUrl(mangaId)
+  }
+
+  async getCloudflareBypassRequestAsync(): Promise<Request> {
+    return App.createRequest({ url: BASE_URL, method: 'GET', headers: this.headers(BASE_URL) })
   }
 
   async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
@@ -232,6 +236,10 @@ export class EpsilonSoft implements Searchable, MangaProviding, ChapterProviding
 
     if (typeof response.data !== 'string') {
       throw new Error(`Epsilon Soft returned an empty response for ${url}`)
+    }
+
+    if (/cf-chl|challenge-platform|just a moment|un instant|verification de securite|vérification de sécurité/i.test(response.data)) {
+      throw new Error(`Epsilon Soft Cloudflare challenge was returned for ${url}`)
     }
 
     return response.data

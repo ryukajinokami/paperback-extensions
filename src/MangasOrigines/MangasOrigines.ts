@@ -41,7 +41,7 @@ export const MangasOriginesInfo: SourceInfo = {
     { text: 'French', type: BadgeColor.BLUE },
     { text: 'Madara', type: BadgeColor.GREEN }
   ],
-  intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS
+  intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED
 }
 
 export class MangasOrigines implements Searchable, MangaProviding, ChapterProviding {
@@ -132,6 +132,10 @@ export class MangasOrigines implements Searchable, MangaProviding, ChapterProvid
 
   getMangaShareUrl(mangaId: string): string {
     return this.parser.buildSeriesUrl(mangaId)
+  }
+
+  async getCloudflareBypassRequestAsync(): Promise<Request> {
+    return App.createRequest({ url: BASE_URL, method: 'GET', headers: this.headers(BASE_URL) })
   }
 
   async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
@@ -267,6 +271,10 @@ export class MangasOrigines implements Searchable, MangaProviding, ChapterProvid
 
     if (typeof response.data !== 'string') {
       throw new Error(`MangasOrigines returned an empty response for ${url}`)
+    }
+
+    if (/cf-chl|challenge-platform|just a moment|un instant|verification de securite|vérification de sécurité/i.test(response.data)) {
+      throw new Error(`Mangas Origines Cloudflare challenge was returned for ${url}`)
     }
 
     return response.data
