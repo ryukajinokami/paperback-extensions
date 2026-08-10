@@ -7,6 +7,7 @@ import { MangasOriginesParser } from '../src/MangasOrigines/MangasOriginesParser
 import { OmegaScansParser } from '../src/OmegaScans/OmegaScansParser'
 import { PoseidonScansParser } from '../src/PoseidonScans/PoseidonScansParser'
 import { createReaderError } from '../src/utils/readerError'
+import { isCloudflareChallenge } from '../src/utils/cloudflare'
 import { normalizeHttpUrl } from '../src/utils/url'
 
 const identity = <T>(value: T): T => value
@@ -30,6 +31,17 @@ test('shared URL normalizer unwraps proxies and encodes reader filenames', () =>
     normalizeHttpUrl('https://cdn.example.com/chapter/01 kopya.jpg', 'https://example.com'),
     'https://cdn.example.com/chapter/01%20kopya.jpg'
   )
+})
+
+test('Cloudflare telemetry on a readable page is not treated as a challenge', () => {
+  const readablePage = `<html><head><title>Catalogue</title></head><body>
+    <article class="page-item-detail">Manga</article>
+    <script src="/cdn-cgi/challenge-platform/scripts/jsd/main.js"></script>
+  </body></html>`
+
+  assert.equal(isCloudflareChallenge(readablePage), false)
+  assert.equal(isCloudflareChallenge('<html><head><title>Just a moment...</title></head></html>'), true)
+  assert.equal(isCloudflareChallenge('<script>window._cf_chl_opt = {};</script>'), true)
 })
 
 test('OmegaScans accepts reader image filenames containing spaces', () => {

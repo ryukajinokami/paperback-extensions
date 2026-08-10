@@ -6,6 +6,7 @@ import {
 import { AstralMangaParser } from './AstralMangaParser'
 import { AstralHomeSectionId, AstralMetadata, AstralSearchParameters } from './models'
 import { BUILD_VERSION } from './version'
+import { isCloudflareChallenge } from '../utils/cloudflare'
 
 const BASE_URL = 'https://astral-manga.fr'
 
@@ -87,7 +88,7 @@ export class AstralManga implements Searchable, MangaProviding, ChapterProviding
     catch (error) { throw new Error(`Astral Manga network request failed for ${url}: ${String(error)}`) }
     if (response.status < 200 || response.status >= 300) throw new Error(`Astral Manga request failed for ${url}: HTTP ${response.status}${response.status === 403 ? ' (Cloudflare challenge)' : ''}`)
     if (typeof response.data !== 'string') throw new Error(`Astral Manga returned an empty response for ${url}`)
-    if (/cf-chl|challenge-platform|just a moment|un instant|verification de securite|vérification de sécurité/i.test(response.data)) throw new Error(`Astral Manga Cloudflare challenge was returned for ${url}`)
+    if (isCloudflareChallenge(response.data)) throw new Error(`Astral Manga Cloudflare challenge was returned for ${url}`)
     return response.data
   }
   private headers(url: string): Request['headers'] { return { referer: `${BASE_URL}/`, accept: /\.(?:jpg|jpeg|png|webp|avif)(?:[?#].*)?$/i.test(url) ? 'image/avif,image/webp,image/*,*/*;q=0.8' : 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 'accept-language': 'fr-FR,fr;q=0.9', 'user-agent': 'Mozilla/5.0 Paperback/0.8 AstralManga' } }

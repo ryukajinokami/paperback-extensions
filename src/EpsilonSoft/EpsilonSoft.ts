@@ -23,6 +23,7 @@ import {
 import { EpsilonHomeSectionId, EpsilonSearchMetadata, EpsilonSearchParameters, EpsilonViewMoreMetadata } from './models'
 import { PoseidonScansParser as EpsilonSoftParser } from '../PoseidonScans/PoseidonScansParser'
 import { BUILD_VERSION } from './version'
+import { isCloudflareChallenge } from '../utils/cloudflare'
 
 const BASE_URL = 'https://epsilonsoft.to'
 
@@ -238,7 +239,7 @@ export class EpsilonSoft implements Searchable, MangaProviding, ChapterProviding
       throw new Error(`Epsilon Soft returned an empty response for ${url}`)
     }
 
-    if (/cf-chl|challenge-platform|just a moment|un instant|verification de securite|vérification de sécurité/i.test(response.data)) {
+    if (isCloudflareChallenge(response.data)) {
       throw new Error(`Epsilon Soft Cloudflare challenge was returned for ${url}`)
     }
 

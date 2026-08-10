@@ -25,6 +25,7 @@ import {
 import { MangasOriginesHomeSectionId, MangasOriginesSearchMetadata, MangasOriginesSearchParameters, MangasOriginesViewMoreMetadata } from './models'
 import { MangasOriginesParser } from './MangasOriginesParser'
 import { BUILD_VERSION } from './version'
+import { isCloudflareChallenge } from '../utils/cloudflare'
 
 const BASE_URL = 'https://mangas-origines.fr'
 
@@ -275,7 +276,7 @@ export class MangasOrigines implements Searchable, MangaProviding, ChapterProvid
       throw new Error(`MangasOrigines returned an empty response for ${url}`)
     }
 
-    if (/cf-chl|challenge-platform|just a moment|un instant|verification de securite|vérification de sécurité/i.test(response.data)) {
+    if (isCloudflareChallenge(response.data)) {
       throw new Error(`Mangas Origines Cloudflare challenge was returned for ${url}`)
     }
 
