@@ -52,12 +52,12 @@
       "path": "bundles/AstralManga/index.js"
     },
     {
-      "id": "MangasOrigines",
-      "name": "Mangas Origines",
+      "id": "MangasOrigines2026",
+      "name": "Mangas Origines - 2026",
       "version": "1.0.0",
       "websiteBaseURL": "https://mangas-origines.fr",
       "contentRating": "ADULT",
-      "path": "bundles/MangasOrigines/index.js"
+      "path": "bundles/MangasOrigines2026/index.js"
     }
   ]
 }

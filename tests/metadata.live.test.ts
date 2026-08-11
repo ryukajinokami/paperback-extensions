@@ -14,7 +14,7 @@ import { AstralManga, AstralMangaInfo } from '../src/AstralManga/AstralManga'
 import { EpsilonSoft, EpsilonSoftInfo } from '../src/EpsilonSoft/EpsilonSoft'
 import { LelManga, LelMangaInfo } from '../src/LelManga/LelManga'
 import { MangaDistrict, MangaDistrictInfo } from '../src/MangaDistrict/MangaDistrict'
-import { MangasOrigines, MangasOriginesInfo } from '../src/MangasOrigines/MangasOrigines'
+import { MangasOrigines2026, MangasOrigines2026Info } from '../src/MangasOrigines2026/MangasOrigines2026'
 import { OmegaScans, OmegaScansInfo } from '../src/OmegaScans/OmegaScans'
 import { PoseidonScans, PoseidonScansInfo } from '../src/PoseidonScans/PoseidonScans'
 
@@ -131,11 +131,11 @@ const cases: MetadataCase[] = [
     createSource: () => new AstralManga()
   },
   {
-    id: 'MangasOrigines',
-    info: MangasOriginesInfo,
+    id: 'MangasOrigines2026',
+    info: MangasOrigines2026Info,
     mangaId: '826-solo-leveling',
     expectedReachable: false,
-    createSource: () => new MangasOrigines()
+    createSource: () => new MangasOrigines2026()
   }
 ]
 

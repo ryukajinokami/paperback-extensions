@@ -3,8 +3,8 @@ import test from 'node:test'
 import { MangaDistrictParser } from '../src/MangaDistrict/MangaDistrictParser'
 import { LelMangaParser } from '../src/LelManga/LelMangaParser'
 import { AstralMangaParser } from '../src/AstralManga/AstralMangaParser'
-import { MangasOriginesParser } from '../src/MangasOrigines/MangasOriginesParser'
-import { MangasOrigines, MangasOriginesInfo } from '../src/MangasOrigines/MangasOrigines'
+import { MangasOrigines2026Parser } from '../src/MangasOrigines2026/MangasOrigines2026Parser'
+import { MangasOrigines2026, MangasOrigines2026Info } from '../src/MangasOrigines2026/MangasOrigines2026'
 import { OmegaScansParser } from '../src/OmegaScans/OmegaScansParser'
 import { PoseidonScansParser } from '../src/PoseidonScans/PoseidonScansParser'
 import { createReaderError } from '../src/utils/readerError'
@@ -224,7 +224,7 @@ test('chapter date fallbacks do not invent the current date', () => {
   const hasTime = (chapter: unknown): boolean => Object.prototype.hasOwnProperty.call(chapter, 'time')
   const omega = new OmegaScansParser('https://omegascans.org', 'https://api.omegascans.org')
   const mangaDistrict = new MangaDistrictParser('https://mangadistrict.com')
-  const mangasOrigines = new MangasOriginesParser('https://mangas-origines.fr')
+  const mangasOrigines2026 = new MangasOrigines2026Parser('https://mangas-origines.fr')
   const poseidon = new PoseidonScansParser('https://poseidon-scans.net')
   const epsilon = new PoseidonScansParser('https://epsilonsoft.to', 'Epsilon Soft')
   const lelManga = new LelMangaParser('https://www.lelmanga.com')
@@ -236,9 +236,9 @@ test('chapter date fallbacks do not invent the current date', () => {
   const districtChapters = mangaDistrict.parseChapters('example', '<li class="wp-manga-chapter"><a href="https://mangadistrict.com/series/example/chapter-1/">Chapter 1</a><span class="timediff"><i>not a date</i></span></li>')
   assert.equal(hasTime(districtChapters[0]), false)
 
-  const originChapters = mangasOrigines.parseChapters('example', '<div class="ori-chl-row"><a class="ori-chl-lire" href="https://mangas-origines.fr/oeuvre/example/chapitre-1/">Chapitre 1</a></div>')
+  const originChapters = mangasOrigines2026.parseChapters('example', '<div class="ori-chl-row"><a class="ori-chl-lire" href="https://mangas-origines.fr/oeuvre/example/chapitre-1/">Chapitre 1</a></div>')
   assert.equal(hasTime(originChapters[0]), false)
-  assert.equal(hasTime(mangasOrigines.parseChapterRange('example', '<a class="ori-chl-lire" href="https://mangas-origines.fr/oeuvre/example/chapitre-3/">Chapitre 3</a>')[0]), false)
+  assert.equal(hasTime(mangasOrigines2026.parseChapterRange('example', '<a class="ori-chl-lire" href="https://mangas-origines.fr/oeuvre/example/chapitre-3/">Chapitre 3</a>')[0]), false)
 
   const poseidonChapters = poseidon.parseChapters('example', '<a href="/serie/example/chapter/1"><h3>Chapitre 1</h3></a>')
   assert.equal(hasTime(poseidonChapters[0]), false)
@@ -254,9 +254,10 @@ test('chapter date fallbacks do not invent the current date', () => {
   assert.equal(hasTime(astralChapters[0]), false)
 })
 
-test('Mangas Origines supports its customized Madara routes and WordPress reader', () => {
-  assert.equal(MangasOriginesInfo.contentRating, 'MATURE')
-  const parser = new MangasOriginesParser('https://mangas-origines.fr')
+test('Mangas Origines - 2026 supports its customized Madara routes and WordPress reader', () => {
+  assert.equal(MangasOrigines2026Info.name, 'Mangas Origines - 2026')
+  assert.equal(MangasOrigines2026Info.contentRating, 'MATURE')
+  const parser = new MangasOrigines2026Parser('https://mangas-origines.fr')
   const catalogue = `<div class="ori-listing-grid ori-cat-grid">
     <a class="ori-card ori-cat-card" href="https://mangas-origines.fr/oeuvre/example/">
       <span class="ori-card-cover"><img src="https://mangas-origines.fr/wp-content/uploads/example.webp" alt="Example"></span>
@@ -298,6 +299,7 @@ test('Mangas Origines supports its customized Madara routes and WordPress reader
   assert.equal(results.results[0]?.image, 'https://mangas-origines.fr/wp-content/uploads/example.webp')
   assert.equal(chapterResults.at(-1)?.id, 'chapitre-12')
   assert.equal(chapterResults.at(-1)?.chapNum, 12)
+  assert.equal(chapterResults[0]?.group, 'Mangas Origines - 2026')
   assert.equal(chapterResults[0]?.time?.getTime(), new Date(2026, 7, 9).getTime())
   assert.equal(chapterResults.at(-1)?.time?.getTime(), new Date(2026, 7, 10).getTime())
   assert.equal(chapterFallback.length, 12)
@@ -315,8 +317,8 @@ test('Mangas Origines supports its customized Madara routes and WordPress reader
   assert.equal(parser.buildChaptersUrl('example'), 'https://mangas-origines.fr/oeuvre/example/ajax/chapters/?t=1&paperback=1')
 })
 
-test('Mangas Origines sends catalogue filters through the marked AJAX endpoint', async () => {
-  const source = new MangasOrigines()
+test('Mangas Origines - 2026 sends catalogue filters through the marked AJAX endpoint', async () => {
+  const source = new MangasOrigines2026()
   const requests: Array<{ url: string, method: string, data: unknown }> = []
   const html = '<a class="ori-card ori-cat-card" href="https://mangas-origines.fr/oeuvre/volcanic-age/"><img src="/cover.webp" alt="Volcanic Age"><span class="ori-card-title">Volcanic Age</span></a>'
 

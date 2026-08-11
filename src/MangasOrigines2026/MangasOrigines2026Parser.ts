@@ -1,12 +1,12 @@
 import { MangaDistrictParser } from '../MangaDistrict/MangaDistrictParser'
 
-export class MangasOriginesParser extends MangaDistrictParser {
+export class MangasOrigines2026Parser extends MangaDistrictParser {
   constructor(baseUrl: string) {
     super(baseUrl, {
       archivePath: 'catalogues',
       seriesPath: 'oeuvre',
       genrePath: 'manga-genres',
-      sourceName: 'Mangas Origines',
+      sourceName: 'Mangas Origines - 2026',
       langCode: 'fr',
       hentai: false,
       acceptWordPressReaderImages: true,

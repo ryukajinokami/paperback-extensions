@@ -12,9 +12,9 @@ This repository targets `@paperback/types` and `@paperback/toolchain` `0.8.0-alp
 - LelManga: https://www.lelmanga.com
 - Epsilon Soft: https://epsilonsoft.to
 - Astral Manga: https://astral-manga.fr
-- Mangas Origines: https://mangas-origines.fr
+- Mangas Origines - 2026: https://mangas-origines.fr
 
-Omega Scans, MangaDistrict, Astral Manga and Mangas Origines are marked `ADULT`. Poseidon Scans, LelManga and Epsilon Soft are marked `MATURE`.
+Omega Scans, MangaDistrict, Astral Manga and Mangas Origines - 2026 are marked `ADULT`. Poseidon Scans, LelManga and Epsilon Soft are marked `MATURE`.
 
 ## Support Matrix: Omega Scans
 
@@ -153,12 +153,13 @@ Notes:
 - Series metadata, UUID chapter lists and public reader images.
 - Reader filtering accepts only raster image URLs and groups them by chapter directory to exclude scripts, covers and recommendations.
 
-## Support Matrix: Mangas Origines
+## Support Matrix: Mangas Origines - 2026
 
 - Madara catalogue search through `/catalogues` with genres and ordering.
 - Series details through `/oeuvre/{slug}`, chapter lists and public WordPress reader images.
 - Homepage sections for updates, views, trends, new series and ratings.
 - Stable series slugs and chapter path IDs.
+- Source ID `MangasOrigines2026` replaces `MangasOrigines`; existing installations must install the new source.
 
 All three sites currently use Cloudflare managed challenges. The sources report an explicit HTTP 403 error when Cloudflare blocks Paperback; no challenge bypass or account automation is included.
 
@@ -200,7 +201,7 @@ Astral Manga:
 - `Type`: `Manga`, `Manhwa`, or `Manhua`.
 - `Tri`: `latest`, `popular`, or `alphabetical`.
 
-Mangas Origines uses the same Madara ordering fields documented for MangaDistrict.
+Mangas Origines - 2026 uses the same Madara ordering fields documented for MangaDistrict.
 
 ## Tests
 
@@ -242,7 +243,7 @@ Enter `s` to skip a source. CI environments disable the prompt automatically. Se
 `PAPERBACK_CLOUDFLARE_INTERACTIVE=0` to disable it manually, `1` to force it, or
 `PAPERBACK_BROWSER_PATH` when Chrome/Edge is installed in a custom location.
 
-The live tests cover Omega Scans, MangaDistrict, Poseidon Scans and LelManga readers, plus catalogue probes for Epsilon Soft, Astral Manga and Mangas Origines. Cloudflare-protected probes are reported and skipped while a managed challenge is active. The live tests are intentionally not scheduled; GitHub Actions runs type checking and deterministic parser tests before building the repository.
+The live tests cover Omega Scans, MangaDistrict, Poseidon Scans and LelManga readers, plus catalogue probes for Epsilon Soft, Astral Manga and Mangas Origines - 2026. Cloudflare-protected probes are reported and skipped while a managed challenge is active. The live tests are intentionally not scheduled; GitHub Actions runs type checking and deterministic parser tests before building the repository.
 
 ## Build
 
@@ -280,8 +281,8 @@ The build creates `bundles/`, including:
 - `bundles/EpsilonSoft/source.js`
 - `bundles/AstralManga/index.js`
 - `bundles/AstralManga/source.js`
-- `bundles/MangasOrigines/index.js`
-- `bundles/MangasOrigines/source.js`
+- `bundles/MangasOrigines2026/index.js`
+- `bundles/MangasOrigines2026/source.js`
 - `bundles/versioning.json`
 - `bundles/index.html`
 

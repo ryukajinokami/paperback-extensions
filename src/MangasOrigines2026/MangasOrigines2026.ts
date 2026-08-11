@@ -22,8 +22,8 @@ import {
   Tag,
   TagSection
 } from '@paperback/types'
-import { MangasOriginesHomeSectionId, MangasOriginesSearchMetadata, MangasOriginesSearchParameters, MangasOriginesViewMoreMetadata } from './models'
-import { MangasOriginesParser } from './MangasOriginesParser'
+import { MangasOrigines2026HomeSectionId, MangasOrigines2026SearchMetadata, MangasOrigines2026SearchParameters, MangasOrigines2026ViewMoreMetadata } from './models'
+import { MangasOrigines2026Parser } from './MangasOrigines2026Parser'
 import { BUILD_VERSION } from './version'
 import { isCloudflareChallenge } from '../utils/cloudflare'
 
@@ -41,10 +41,10 @@ interface CatalogueResponse {
 type FormValue = string | number | boolean
 type FormFields = Record<string, FormValue>
 
-export const MangasOriginesInfo: SourceInfo = {
-  name: 'Mangas Origines',
+export const MangasOrigines2026Info: SourceInfo = {
+  name: 'Mangas Origines - 2026',
   author: 'Paperback Community',
-  description: 'French Mangas Origines source with Madara catalogue filters, details and public reader pages.',
+  description: 'French Mangas Origines - 2026 source with Madara catalogue filters, details and public reader pages.',
   contentRating: ContentRating.MATURE,
   icon: 'icon.png',
   version: BUILD_VERSION,
@@ -57,7 +57,7 @@ export const MangasOriginesInfo: SourceInfo = {
   intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED
 }
 
-export class MangasOrigines implements Searchable, MangaProviding, ChapterProviding {
+export class MangasOrigines2026 implements Searchable, MangaProviding, ChapterProviding {
   private readonly interceptor: SourceInterceptor = {
     interceptRequest: async request => {
       request.headers = {
@@ -76,11 +76,11 @@ export class MangasOrigines implements Searchable, MangaProviding, ChapterProvid
     requestTimeout: 20000
   })
 
-  private readonly parser = new MangasOriginesParser(BASE_URL)
+  private readonly parser = new MangasOrigines2026Parser(BASE_URL)
 
   async getSearchResults(query: SearchRequest, metadata: unknown | undefined): Promise<PagedResults> {
-    const page = (metadata as MangasOriginesSearchMetadata | undefined)?.page ?? 1
-    const orderBy = this.normalizeOrderBy((query.parameters as MangasOriginesSearchParameters | undefined)?.orderBy, query.title?.trim().length ? 'relevance' : 'modified')
+    const page = (metadata as MangasOrigines2026SearchMetadata | undefined)?.page ?? 1
+    const orderBy = this.normalizeOrderBy((query.parameters as MangasOrigines2026SearchParameters | undefined)?.orderBy, query.title?.trim().length ? 'relevance' : 'modified')
     const includedTagIds = query.includedTags.map(tag => tag.id)
     const results = await this.getCataloguePage(orderBy, page, query.title?.trim() ?? '', includedTagIds)
 
@@ -140,7 +140,7 @@ export class MangasOrigines implements Searchable, MangaProviding, ChapterProvid
         return chapters
       }
     } catch (error) {
-      console.log(`MangasOrigines chapter AJAX failed for ${mangaId}, using series fallback: ${String(error)}`)
+      console.log(`MangasOrigines2026 chapter AJAX failed for ${mangaId}, using series fallback: ${String(error)}`)
     }
 
     const seriesHtml = await this.requestText(this.parser.buildSeriesUrl(mangaId))
@@ -167,28 +167,28 @@ export class MangasOrigines implements Searchable, MangaProviding, ChapterProvid
   async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
     const sections = [
       App.createHomeSection({
-        id: MangasOriginesHomeSectionId.Latest,
+        id: MangasOrigines2026HomeSectionId.Latest,
         title: 'Latest Updates',
         type: HomeSectionType.singleRowNormal,
         items: [],
         containsMoreItems: true
       }),
       App.createHomeSection({
-        id: MangasOriginesHomeSectionId.Popular,
+        id: MangasOrigines2026HomeSectionId.Popular,
         title: 'Most Viewed',
         type: HomeSectionType.singleRowNormal,
         items: [],
         containsMoreItems: true
       }),
       App.createHomeSection({
-        id: MangasOriginesHomeSectionId.Rating,
+        id: MangasOrigines2026HomeSectionId.Rating,
         title: 'Highest Rated',
         type: HomeSectionType.singleRowNormal,
         items: [],
         containsMoreItems: true
       }),
       App.createHomeSection({
-        id: MangasOriginesHomeSectionId.Alphabet,
+        id: MangasOrigines2026HomeSectionId.Alphabet,
         title: 'A-Z',
         type: HomeSectionType.singleRowNormal,
         items: [],
@@ -207,26 +207,26 @@ export class MangasOrigines implements Searchable, MangaProviding, ChapterProvid
         section.containsMoreItems = results.metadata !== undefined
         sectionCallback(section)
       } catch (error) {
-        console.log(`MangasOrigines homepage section failed: ${section.id} ${String(error)}`)
+        console.log(`MangasOrigines2026 homepage section failed: ${section.id} ${String(error)}`)
       }
     }))
   }
 
   async getViewMoreItems(homepageSectionId: string, metadata: unknown | undefined): Promise<PagedResults> {
-    const page = (metadata as MangasOriginesViewMoreMetadata | undefined)?.page ?? 1
+    const page = (metadata as MangasOrigines2026ViewMoreMetadata | undefined)?.page ?? 1
 
     switch (homepageSectionId) {
-      case MangasOriginesHomeSectionId.Latest:
+      case MangasOrigines2026HomeSectionId.Latest:
         return this.getArchivePage('modified', page)
-      case MangasOriginesHomeSectionId.Popular:
+      case MangasOrigines2026HomeSectionId.Popular:
         return this.getArchivePage('views', page)
-      case MangasOriginesHomeSectionId.Trending:
+      case MangasOrigines2026HomeSectionId.Trending:
         return this.getArchivePage('trending', page)
-      case MangasOriginesHomeSectionId.NewSeries:
+      case MangasOrigines2026HomeSectionId.NewSeries:
         return this.getArchivePage('new-manga', page)
-      case MangasOriginesHomeSectionId.Rating:
+      case MangasOrigines2026HomeSectionId.Rating:
         return this.getArchivePage('rating', page)
-      case MangasOriginesHomeSectionId.Alphabet:
+      case MangasOrigines2026HomeSectionId.Alphabet:
         return this.getArchivePage('alphabet', page)
       default:
         return App.createPagedResults({ results: [] })
@@ -263,11 +263,11 @@ export class MangasOrigines implements Searchable, MangaProviding, ChapterProvid
     try {
       payload = JSON.parse(response) as CatalogueResponse
     } catch (error) {
-      throw new Error(`Mangas Origines returned invalid catalogue JSON: ${String(error)}`)
+      throw new Error(`Mangas Origines - 2026 returned invalid catalogue JSON: ${String(error)}`)
     }
 
     if (!payload.success || typeof payload.data?.html !== 'string') {
-      throw new Error('Mangas Origines catalogue request was rejected')
+      throw new Error('Mangas Origines - 2026 catalogue request was rejected')
     }
 
     const parsed = this.parser.parseMangaList(payload.data.html, page)
@@ -302,7 +302,7 @@ export class MangasOrigines implements Searchable, MangaProviding, ChapterProvid
 
         return excludedIds.some(tagId => seriesTagIds.includes(tagId)) ? undefined : result
       } catch (error) {
-        console.log(`MangasOrigines tag exclusion skipped for ${result.mangaId}: ${String(error)}`)
+        console.log(`MangasOrigines2026 tag exclusion skipped for ${result.mangaId}: ${String(error)}`)
         return result
       }
     }))).filter((result): result is PartialSourceManga => result !== undefined)
@@ -340,19 +340,19 @@ export class MangasOrigines implements Searchable, MangaProviding, ChapterProvid
     try {
       response = await this.requestManager.schedule(request, 2)
     } catch (error) {
-      throw new Error(`MangasOrigines network request failed for ${url}: ${String(error)}`)
+      throw new Error(`MangasOrigines2026 network request failed for ${url}: ${String(error)}`)
     }
 
     if (response.status < 200 || response.status >= 300) {
-      throw new Error(`Mangas Origines request failed for ${url}: HTTP ${response.status}${response.status === 403 ? ' (Cloudflare challenge)' : ''}`)
+      throw new Error(`Mangas Origines - 2026 request failed for ${url}: HTTP ${response.status}${response.status === 403 ? ' (Cloudflare challenge)' : ''}`)
     }
 
     if (typeof response.data !== 'string') {
-      throw new Error(`MangasOrigines returned an empty response for ${url}`)
+      throw new Error(`MangasOrigines2026 returned an empty response for ${url}`)
     }
 
     if (isCloudflareChallenge(response.data)) {
-      throw new Error(`Mangas Origines Cloudflare challenge was returned for ${url}`)
+      throw new Error(`Mangas Origines - 2026 Cloudflare challenge was returned for ${url}`)
     }
 
     return response.data

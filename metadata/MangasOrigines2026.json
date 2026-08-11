@@ -1,10 +1,10 @@
 {
-  "id": "MangasOrigines",
+  "id": "MangasOrigines2026",
   "version": "2026.8.11.19",
-  "name": "Mangas Origines",
+  "name": "Mangas Origines - 2026",
   "icon": "icon.png",
   "author": "Paperback Community",
-  "description": "French Mangas Origines source with Madara catalogue filters, details and public reader pages.",
+  "description": "French Mangas Origines - 2026 source with Madara catalogue filters, details and public reader pages.",
   "contentRating": "MATURE",
   "websiteBaseURL": "https://mangas-origines.fr",
   "authorWebsite": null,
@@ -115,7 +115,7 @@
       "langCode": "fr",
       "name": "Chapitre 200",
       "volume": null,
-      "group": "Mangas Origines",
+      "group": "Mangas Origines - 2026",
       "time": "2023-06-20T22:00:00.000Z",
       "sortingIndex": 200,
       "_missing": {

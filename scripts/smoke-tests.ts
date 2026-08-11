@@ -1,7 +1,7 @@
 import { MangaDistrictParser } from '../src/MangaDistrict/MangaDistrictParser'
 import { LelMangaParser } from '../src/LelManga/LelMangaParser'
 import { AstralMangaParser } from '../src/AstralManga/AstralMangaParser'
-import { MangasOriginesParser } from '../src/MangasOrigines/MangasOriginesParser'
+import { MangasOrigines2026Parser } from '../src/MangasOrigines2026/MangasOrigines2026Parser'
 import { OmegaScansParser } from '../src/OmegaScans/OmegaScansParser'
 import { PoseidonScansParser } from '../src/PoseidonScans/PoseidonScansParser'
 
@@ -97,19 +97,19 @@ async function main(): Promise<void> {
     new PoseidonScansParser('https://epsilonsoft.to', 'Epsilon Soft').parseMangaList(html, 1).results.length)
   await probeProtectedSource('Astral Manga', 'https://astral-manga.fr/catalog', html =>
     new AstralMangaParser('https://astral-manga.fr').parseMangaList(html, 1).results.length)
-  await auditMangasOrigines()
+  await auditMangasOrigines2026()
 }
 
-async function auditMangasOrigines(): Promise<void> {
+async function auditMangasOrigines2026(): Promise<void> {
   const baseUrl = 'https://mangas-origines.fr'
-  const parser = new MangasOriginesParser(baseUrl)
+  const parser = new MangasOrigines2026Parser(baseUrl)
   const cataloguePageRequest = await fetch(`${baseUrl}/catalogues/`, { headers: liveHeaders() })
   const cataloguePage = await cataloguePageRequest.text()
   if (cataloguePageRequest.status === 403 && /cloudflare|cf-chl|attention required|just a moment/i.test(cataloguePage)) {
-    console.log('Mangas Origines: Cloudflare challenge active, live parser check skipped')
+    console.log('Mangas Origines - 2026: Cloudflare challenge active, live parser check skipped')
     return
   }
-  if (!cataloguePageRequest.ok) throw new Error(`Mangas Origines: catalogue HTTP ${cataloguePageRequest.status}`)
+  if (!cataloguePageRequest.ok) throw new Error(`Mangas Origines - 2026: catalogue HTTP ${cataloguePageRequest.status}`)
   const tags = parser.parseSearchTags(cataloguePage)
   const body = new URLSearchParams({
     action: 'madara_child_catalogue', s: 'volcanic', genres: '', statut: 'tous', note: '0', origine: '',
@@ -124,7 +124,7 @@ async function auditMangasOrigines(): Promise<void> {
     },
     body
   })
-  if (!catalogueRequest.ok) throw new Error(`Mangas Origines: catalogue HTTP ${catalogueRequest.status}`)
+  if (!catalogueRequest.ok) throw new Error(`Mangas Origines - 2026: catalogue HTTP ${catalogueRequest.status}`)
   const catalogueResponse = JSON.parse(await catalogueRequest.text()) as {
     success?: boolean
     data?: { html?: string, more?: boolean }
@@ -133,7 +133,7 @@ async function auditMangasOrigines(): Promise<void> {
   const mangaId = catalogue.results[0]?.mangaId
 
   if (!catalogueResponse.success || !mangaId || (tags[0]?.tags.length ?? 0) === 0) {
-    throw new Error('Mangas Origines: catalogue AJAX, search or filters are empty')
+    throw new Error('Mangas Origines - 2026: catalogue AJAX, search or filters are empty')
   }
 
   const seriesHtml = await request(parser.buildSeriesUrl(mangaId))
@@ -142,7 +142,7 @@ async function auditMangasOrigines(): Promise<void> {
   const latestChapter = chapters.at(-1)
 
   if (!latestChapter || info.titles.length === 0 || info.author === 'Unknown' || info.tags[0]?.tags.length === 0) {
-    throw new Error('Mangas Origines: metadata or chapter fallback is empty')
+    throw new Error('Mangas Origines - 2026: metadata or chapter fallback is empty')
   }
 
   const readerHtml = await request(parser.buildChapterUrl(mangaId, latestChapter.id))
@@ -150,10 +150,10 @@ async function auditMangasOrigines(): Promise<void> {
   const imageResponse = await fetch(details.pages[0] ?? '', { headers: liveHeaders(parser.buildChapterUrl(mangaId, latestChapter.id)) })
 
   if (!imageResponse.ok || details.pages.length === 0) {
-    throw new Error('Mangas Origines: reader image is unavailable')
+    throw new Error('Mangas Origines - 2026: reader image is unavailable')
   }
 
-  console.log(`Mangas Origines: ${catalogue.results.length} search entries, ${tags[0]?.tags.length ?? 0} genres, ${chapters.length} fallback chapters, ${details.pages.length} reader pages`)
+  console.log(`Mangas Origines - 2026: ${catalogue.results.length} search entries, ${tags[0]?.tags.length ?? 0} genres, ${chapters.length} fallback chapters, ${details.pages.length} reader pages`)
 }
 
 async function probeProtectedSource(name: string, url: string, parse: (html: string) => number): Promise<void> {
