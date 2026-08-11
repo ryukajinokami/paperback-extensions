@@ -321,6 +321,30 @@ export class PoseidonScansParser {
 
   private extractReaderImages(mangaId: string, html: string): string[] {
     const text = this.searchableHtml(html)
+    const pages = this.extractReaderImageUrls(mangaId, text)
+    const orderedPages = this.extractOrderedReaderImages(mangaId, text)
+
+    if (orderedPages.length !== pages.length) {
+      return pages
+    }
+
+    const pageLookup = new Set(pages)
+    const orders = new Set<number>()
+
+    for (const page of orderedPages) {
+      if (!pageLookup.has(page.url) || orders.has(page.order)) {
+        return pages
+      }
+
+      orders.add(page.order)
+    }
+
+    return orderedPages
+      .sort((left, right) => left.order - right.order)
+      .map(page => page.url)
+  }
+
+  private extractReaderImageUrls(mangaId: string, text: string): string[] {
     const imagePattern = /src(?:=|":)"([^"]*\/api\/chapters\/[^"]+)"/gi
     const seen: Record<string, boolean> = {}
     const pages: string[] = []
@@ -335,6 +359,30 @@ export class PoseidonScansParser {
 
       seen[url] = true
       pages.push(url)
+    }
+
+    return pages
+  }
+
+  private extractOrderedReaderImages(mangaId: string, text: string): Array<{ url: string, order: number }> {
+    const blockPattern = /(<div\b[^>]*\bclass=["'][^"']*\breader-vimg\b[^"']*["'][^>]*>)[\s\S]*?<img\b[^>]*\bsrc=["']([^"']*\/api\/chapters\/[^"']+)["'][^>]*>/gi
+    const seen: Record<string, boolean> = {}
+    const pages: Array<{ url: string, order: number }> = []
+    let match: RegExpExecArray | null
+
+    while ((match = blockPattern.exec(text)) !== null) {
+      const openingTag = match[1] ?? ''
+      const orderValue = /\bdata-order=["'](\d+)["']/i.exec(openingTag)?.[1]
+        ?? /\bdata-sequence=["'](\d+)["']/i.exec(openingTag)?.[1]
+      const order = Number(orderValue)
+      const url = this.normalizeUrl(match[2] ?? '')
+
+      if (!Number.isFinite(order) || !this.isReaderPageImage(url, mangaId) || seen[url]) {
+        continue
+      }
+
+      seen[url] = true
+      pages.push({ url, order })
     }
 
     return pages

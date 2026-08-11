@@ -369,7 +369,7 @@ export class MangasOrigines implements Searchable, MangaProviding, ChapterProvid
   }
 
   private async headers(url: string): Promise<Request['headers']> {
-    const imageRequest = /\.(?:jpg|jpeg|png|webp|gif)(?:[?#].*)?$/i.test(url)
+    const imageRequest = /\.(?:jpg|jpeg|png|webp|gif|avif)(?:[?#].*)?$/i.test(url)
 
     return {
       referer: `${BASE_URL}/`,

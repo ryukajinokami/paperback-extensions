@@ -559,7 +559,7 @@ export class MangaDistrictParser {
 
     const lower = url.toLowerCase()
 
-    if (!/\.(?:jpg|jpeg|png|webp|gif)(?:[?#].*)?$/.test(lower)) {
+    if (!/\.(?:jpg|jpeg|png|webp|gif|avif)(?:[?#].*)?$/.test(lower)) {
       return false
     }
 

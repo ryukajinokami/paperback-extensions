@@ -68,13 +68,15 @@ test('MangaDistrict keeps only chapter reader images', () => {
   const html = `
     <div class="reading-content">
       <img class="wp-manga-chapter-img" data-src="https://cdn.mangadistrict.com/publication/example/chapter-1/001.jpg">
+      <img class="wp-manga-chapter-img" src="https://cdn.mangadistrict.com/publication/example/chapter-1/002.avif">
       <img class="wp-manga-chapter-img" src="https://mangadistrict.com/wp-content/logo.png">
     </div>
   `
   const details = parser.parseChapterDetails('example', 'chapter-1', html)
 
   assert.deepEqual(details.pages, [
-    'https://cdn.mangadistrict.com/publication/example/chapter-1/001.jpg'
+    'https://cdn.mangadistrict.com/publication/example/chapter-1/001.jpg',
+    'https://cdn.mangadistrict.com/publication/example/chapter-1/002.avif'
   ])
 })
 
@@ -144,6 +146,24 @@ test('PoseidonScans parses free chapters, metadata and reader pages', () => {
   assert.equal(chapters.length, 1)
   assert.equal(chapters[0]?.id, '1')
   assert.deepEqual(details.pages, ['https://poseidon-scans.net/api/chapters/example/chapter-id/page-id'])
+})
+
+test('PoseidonScans restores shuffled reader pages and preserves the HTML fallback order', () => {
+  const parser = new PoseidonScansParser('https://poseidon-scans.net')
+  const pageUrl = (page: number): string => `https://poseidon-scans.net/api/chapters/example/chapter-id/page-${page}`
+  const readerBlock = (page: number, order: string): string => `
+    <div class="reader-vimg" data-sequence="${order}" data-order="${order}">
+      <div><img src="${pageUrl(page)}"></div>
+    </div>`
+
+  const shuffled = readerBlock(3, '3') + readerBlock(1, '1') + readerBlock(2, '2')
+  assert.deepEqual(parser.parseChapterDetails('example', '1', shuffled).pages, [pageUrl(1), pageUrl(2), pageUrl(3)])
+
+  const incomplete = readerBlock(2, '2') + `<img src="${pageUrl(1)}">`
+  assert.deepEqual(parser.parseChapterDetails('example', '1', incomplete).pages, [pageUrl(2), pageUrl(1)])
+
+  const duplicateOrders = readerBlock(2, '1') + readerBlock(1, '1')
+  assert.deepEqual(parser.parseChapterDetails('example', '1', duplicateOrders).pages, [pageUrl(2), pageUrl(1)])
 })
 
 test('reader diagnostics distinguish restricted chapters and missing pages', () => {
@@ -327,14 +347,17 @@ test('Astral Manga parses UUID routes and selects the chapter image directory', 
   const parser = new AstralMangaParser('https://astral-manga.fr')
   const mangaId = '01b2c442-e484-4d77-a07a-c2714b718d24'
   const chapterId = '293db8d9-6f01-4911-b6f1-045298b20c79'
-  const catalogue = `<a href="/manga/${mangaId}"><img src="/uploads/covers/example.webp" alt="Example"></a>`
+  const catalogue = `<a href="/manga/${mangaId}"><script src="/_next/static/chunks/app.js"></script><img src="/uploads/covers/example.webp" alt="Example"></a>`
   const series = `<h1>Example</h1><a href="/manga/${mangaId}/chapter/${chapterId}">Chapitre 173</a>`
-  const reader = '<img src="/images/logo.png"><script>{"images":["/uploads/chapters/example/001.webp","/uploads/chapters/example/002.webp"],"cover":"/uploads/covers/example.webp"}</script>'
-  assert.equal(parser.parseMangaList(catalogue, 1).results[0]?.mangaId, mangaId)
+  const reader = '<script src="/_next/static/chunks/app.js"></script><img src="/images/logo.png"><script>{"images":["/uploads/chapters/example/001.webp","/uploads/chapters/example/002.webp"],"cover":"/uploads/covers/example.webp"}</script>'
+  const result = parser.parseMangaList(catalogue, 1).results[0]
+  assert.equal(result?.mangaId, mangaId)
+  assert.equal(result?.image, 'https://astral-manga.fr/uploads/covers/example.webp')
   assert.equal(parser.parseChapters(mangaId, series)[0]?.chapNum, 173)
   assert.deepEqual(parser.parseChapterDetails(mangaId, chapterId, reader).pages, [
     'https://astral-manga.fr/uploads/chapters/example/001.webp',
     'https://astral-manga.fr/uploads/chapters/example/002.webp'
   ])
+  assert.throws(() => parser.parseChapterDetails(mangaId, chapterId, '<script src="/_next/static/chunks/app.js"></script>'))
   assert.equal(parser.buildCatalogueUrl(1, '', [{ id: 'Action', label: 'Action' }]), 'https://astral-manga.fr/catalog?tags=Action')
 })

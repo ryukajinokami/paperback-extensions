@@ -83,7 +83,7 @@ Notes:
 
 - MangaDistrict is a Madara/WordPress site. Public HTML selectors can change without API versioning.
 - Chapter IDs use the `chapter-*` slug from URLs like `/series/{slug}/chapter-1/`.
-- The reader parser keeps only CDN page URLs under `/publication/.../chapter-*`.
+- The reader parser keeps only JPEG, PNG, WebP, GIF or AVIF CDN page URLs under `/publication/.../chapter-*`.
 
 ## Support Matrix: Poseidon Scans
 
@@ -115,7 +115,7 @@ Notes:
 
 - Poseidon Scans is a French Next.js site. Public HTML and server-rendered data can change without API versioning.
 - Chapter IDs use the number/path segment from URLs like `/serie/{slug}/chapter/{number}`.
-- The reader parser keeps only public `/api/chapters/{series}/{chapter}/{page}` image URLs and ignores previews/comments.
+- The reader parser keeps only public `/api/chapters/{series}/{chapter}/{page}` image URLs, ignores previews/comments and restores Poseidon's displayed page order when the HTML blocks are shuffled.
 
 ## Support Matrix: LelManga
 
@@ -151,7 +151,7 @@ Notes:
 - Support for the current UUID-based `/catalog` and `/manga/{uuid}` application.
 - Search by title, tags, status and type with latest, popular and alphabetical views.
 - Series metadata, UUID chapter lists and public reader images.
-- Reader filtering groups images by chapter directory to exclude covers and recommendations.
+- Reader filtering accepts only raster image URLs and groups them by chapter directory to exclude scripts, covers and recommendations.
 
 ## Support Matrix: Mangas Origines
 

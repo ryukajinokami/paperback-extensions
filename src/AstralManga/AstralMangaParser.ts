@@ -125,10 +125,12 @@ export class AstralMangaParser {
     const patterns = [/(?:src|data-src)=["']([^"']+)["']/gi, /["']((?:https?:\\?\/\\?\/|\/)[^"']+\.(?:jpg|jpeg|png|webp|avif)(?:\?[^"']*)?)["']/gi]
     for (const pattern of patterns) for (const match of text.matchAll(pattern)) {
       const url = normalizeHttpUrl(this.decode(match[1] ?? ''), this.baseUrl)
-      if (url && !values.includes(url)) values.push(url)
+      if (this.isSupportedImageUrl(url) && !values.includes(url)) values.push(url)
     }
     return values
   }
+
+  private isSupportedImageUrl(url: string): boolean { return /\.(?:jpg|jpeg|png|webp|avif)(?:[?#].*)?$/i.test(url) }
 
   private value(text: string, fields: string[]): string {
     for (const field of fields) {

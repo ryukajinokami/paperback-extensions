@@ -274,7 +274,7 @@ export class MangaDistrict implements Searchable, MangaProviding, ChapterProvidi
   }
 
   private headers(url: string): Request['headers'] {
-    const imageRequest = /\.(?:jpg|jpeg|png|webp|gif)(?:[?#].*)?$/i.test(url)
+    const imageRequest = /\.(?:jpg|jpeg|png|webp|gif|avif)(?:[?#].*)?$/i.test(url)
 
     return {
       referer: `${BASE_URL}/`,
