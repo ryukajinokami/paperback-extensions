@@ -1,0 +1,158 @@
+{
+  "id": "LelManga",
+  "version": "2026.8.11.19",
+  "name": "LelManga",
+  "icon": "icon.png",
+  "author": "Paperback Community",
+  "description": "French LelManga source with catalogue filters, metadata and public reader pages.",
+  "contentRating": "MATURE",
+  "websiteBaseURL": "https://www.lelmanga.com",
+  "authorWebsite": null,
+  "language": "French",
+  "sourceTags": [
+    {
+      "text": "French",
+      "type": "default"
+    },
+    {
+      "text": "Manga",
+      "type": "success"
+    },
+    {
+      "text": "Manhwa",
+      "type": "info"
+    },
+    {
+      "text": "Manhua",
+      "type": "warning"
+    }
+  ],
+  "intents": 5,
+  "intentNames": [
+    "MANGA_CHAPTERS",
+    "HOMEPAGE_SECTIONS"
+  ],
+  "_missing": {
+    "authorWebsite": "NOT_FOUND: optional Paperback metadata is not configured."
+  },
+  "_contract": "@paperback/types SourceInfo, MangaInfo, Chapter and ChapterDetails 0.8.0-alpha.38",
+  "manga": {
+    "fetchStatus": "FOUND",
+    "mangaId": "manga/one-piece",
+    "shareUrl": "https://www.lelmanga.com/manga/one-piece",
+    "fetchedAt": "2026-08-11T12:05:07.013Z",
+    "metadata": {
+      "image": "https://i3.wp.com/www.lelmanga.com/wp-content/uploads/2021/02/One-Piece.jpg",
+      "artist": null,
+      "author": null,
+      "desc": "Gloire, fortune et puissance, c’est ce que possédait Gold Roger, le tout puissant roi des pirates, avant de mourir sur l’échafaud. Mais ses dernières paroles ont éveillées bien des convoitises, et lança la fabuleuse “ère de la piraterie”, chacun voulant trouver le fabuleux trésor qu’il disait avoir laissé. Bien des années plus tard, Shanks, un redoutable pirate aux cheveux rouges, rencontre Luffy, un jeune garçon d’une dizaine d’années dans un petit port de pêche. Il veut devenir pirate et le rejoindre, mais Shanks lui répond qu’il est trop jeune. Plus tard, Luffy avalera accidentellement le fruit Gomu Gomu qui rendra son corps élastique, mais aussi maudit par les eaux. Incapable de nager, Luffy ne veut pourtant pas renoncer à son rêve. Pour le consoler lorsqu’il part, Shanks lui offre son chapeau. Luffy jure alors de le rejoindre un jour avec son propre équipage. A 17 ans, Luffy prend la mer dans une petite barque avec pour but de réunir un équipage de pirates, mais de pirates pas comme les autres, qui devront partager sa conception un peu étrange de la piraterie. L’aventure est lancée.",
+      "status": "En cours",
+      "hentai": false,
+      "titles": [
+        "One Piece"
+      ],
+      "banner": null,
+      "rating": 9.89,
+      "tags": [
+        {
+          "id": "genres",
+          "label": "Genres",
+          "tags": [
+            {
+              "id": "action",
+              "label": "Action"
+            },
+            {
+              "id": "aventure",
+              "label": "Aventure"
+            },
+            {
+              "id": "comedie",
+              "label": "Comédie"
+            },
+            {
+              "id": "fantastique",
+              "label": "Fantastique"
+            },
+            {
+              "id": "shonen",
+              "label": "Shônen"
+            }
+          ]
+        }
+      ],
+      "covers": [
+        "https://i3.wp.com/www.lelmanga.com/wp-content/uploads/2021/02/One-Piece.jpg"
+      ],
+      "additionalInfo": {
+        "Type": "Manga",
+        "Followers": "4330"
+      },
+      "avgRating": null,
+      "follows": null,
+      "langFlag": null,
+      "langName": null,
+      "users": null,
+      "views": null,
+      "_missing": {
+        "artist": "NOT_FOUND: required MangaInfo metadata was not returned by the source.",
+        "author": "NOT_FOUND: required MangaInfo metadata was not returned by the source.",
+        "banner": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "avgRating": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "follows": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "langFlag": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "langName": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "users": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "views": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source."
+      }
+    },
+    "error": null
+  },
+  "chapter": {
+    "fetchStatus": "FOUND",
+    "mangaId": "manga/one-piece",
+    "chapterCount": 186,
+    "fetchedAt": "2026-08-11T12:05:07.133Z",
+    "metadata": {
+      "id": "one-piece-1190",
+      "chapNum": 1190,
+      "langCode": "fr",
+      "name": "Chapitre 1190",
+      "volume": null,
+      "group": "LelManga",
+      "time": "2026-08-08T22:00:00.000Z",
+      "sortingIndex": 1190,
+      "_missing": {
+        "volume": "NOT_FOUND: required Chapter metadata was not returned by the source."
+      }
+    },
+    "details": {
+      "fetchStatus": "FOUND",
+      "fetchedAt": "2026-08-11T12:05:07.133Z",
+      "metadata": {
+        "id": "one-piece-1190",
+        "mangaId": "manga/one-piece",
+        "pages": [
+          "https://www.lelmanga.com/wp-content/uploads/2026/08/one-piece-1190-update-20260809172937-ymtnqw/001.webp?lmv=1786296577",
+          "https://www.lelmanga.com/wp-content/uploads/2026/08/one-piece-1190-update-20260809172937-ymtnqw/002.webp?lmv=1786296577",
+          "https://www.lelmanga.com/wp-content/uploads/2026/08/one-piece-1190-update-20260809172937-ymtnqw/003.webp?lmv=1786296577",
+          "https://www.lelmanga.com/wp-content/uploads/2026/08/one-piece-1190-update-20260809172937-ymtnqw/004.webp?lmv=1786296577",
+          "https://www.lelmanga.com/wp-content/uploads/2026/08/one-piece-1190-update-20260809172937-ymtnqw/005.webp?lmv=1786296577",
+          "https://www.lelmanga.com/wp-content/uploads/2026/08/one-piece-1190-update-20260809172937-ymtnqw/006.webp?lmv=1786296577",
+          "https://www.lelmanga.com/wp-content/uploads/2026/08/one-piece-1190-update-20260809172937-ymtnqw/007.webp?lmv=1786296577",
+          "https://www.lelmanga.com/wp-content/uploads/2026/08/one-piece-1190-update-20260809172937-ymtnqw/008.webp?lmv=1786296577",
+          "https://www.lelmanga.com/wp-content/uploads/2026/08/one-piece-1190-update-20260809172937-ymtnqw/009.webp?lmv=1786296577",
+          "https://www.lelmanga.com/wp-content/uploads/2026/08/one-piece-1190-update-20260809172937-ymtnqw/010.webp?lmv=1786296577",
+          "https://www.lelmanga.com/wp-content/uploads/2026/08/one-piece-1190-update-20260809172937-ymtnqw/011.webp?lmv=1786296577",
+          "https://www.lelmanga.com/wp-content/uploads/2026/08/one-piece-1190-update-20260809172937-ymtnqw/012.webp?lmv=1786296577",
+          "https://www.lelmanga.com/wp-content/uploads/2026/08/one-piece-1190-update-20260809172937-ymtnqw/013.webp?lmv=1786296577",
+          "https://www.lelmanga.com/wp-content/uploads/2026/08/one-piece-1190-update-20260809172937-ymtnqw/014.webp?lmv=1786296577",
+          "https://www.lelmanga.com/wp-content/uploads/2026/08/one-piece-1190-update-20260809172937-ymtnqw/015.webp?lmv=1786296577"
+        ],
+        "_missing": {}
+      },
+      "error": null
+    },
+    "error": null
+  }
+}

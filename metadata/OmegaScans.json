@@ -1,0 +1,149 @@
+{
+  "id": "OmegaScans",
+  "version": "2026.8.11.19",
+  "name": "Omega Scans",
+  "icon": "icon.png",
+  "author": "Paperback Community",
+  "description": "Omega Scans source for Paperback v0.8. Supports search, details, chapters and reader pages.",
+  "contentRating": "ADULT",
+  "websiteBaseURL": "https://omegascans.org",
+  "authorWebsite": null,
+  "language": "English",
+  "sourceTags": [
+    {
+      "text": "English",
+      "type": "default"
+    },
+    {
+      "text": "Comic",
+      "type": "success"
+    },
+    {
+      "text": "Novel",
+      "type": "info"
+    }
+  ],
+  "intents": 5,
+  "intentNames": [
+    "MANGA_CHAPTERS",
+    "HOMEPAGE_SECTIONS"
+  ],
+  "_missing": {
+    "authorWebsite": "NOT_FOUND: optional Paperback metadata is not configured."
+  },
+  "_contract": "@paperback/types SourceInfo, MangaInfo, Chapter and ChapterDetails 0.8.0-alpha.38",
+  "manga": {
+    "fetchStatus": "FOUND",
+    "mangaId": "my-new-family-treats-me-well",
+    "shareUrl": "https://omegascans.org/series/my-new-family-treats-me-well",
+    "fetchedAt": "2026-08-11T12:05:05.201Z",
+    "metadata": {
+      "image": "https://media.omegascans.org/file/zFSsXt/lp1m9siucm6chq26pmc2mpns.webp",
+      "artist": "Toptoon",
+      "author": "-",
+      "desc": "I met my new family after being rescued from an abusive family at a young age... But my mother is a charismatic actress, my older sister is a golf legend, and my younger sister is a popular idol! I'm too undeserving of my new family, but they're really nice to me. \"Your mother will take care of your urges, son.\"",
+      "status": "Completed",
+      "hentai": true,
+      "titles": [
+        "My New Family Treats Me Well",
+        "새 가족이 너무 잘해준다",
+        "My New Family Is Too Nice to Me"
+      ],
+      "banner": null,
+      "rating": 4.9,
+      "tags": [
+        {
+          "id": "genres",
+          "label": "Genres",
+          "tags": [
+            {
+              "id": "1",
+              "label": "Romance"
+            },
+            {
+              "id": "2",
+              "label": "Drama"
+            },
+            {
+              "id": "16",
+              "label": "MILF"
+            },
+            {
+              "id": "27",
+              "label": "Cohabitation"
+            }
+          ]
+        }
+      ],
+      "covers": [
+        "https://media.omegascans.org/file/zFSsXt/lp1m9siucm6chq26pmc2mpns.webp"
+      ],
+      "additionalInfo": {
+        "Type": "Comic",
+        "Views": "7218409",
+        "Chapters": "130",
+        "Bookmarks": "3822"
+      },
+      "avgRating": null,
+      "follows": null,
+      "langFlag": null,
+      "langName": null,
+      "users": null,
+      "views": null,
+      "_missing": {
+        "author": "NOT_FOUND: required MangaInfo metadata was not returned by the source.",
+        "banner": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "avgRating": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "follows": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "langFlag": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "langName": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "users": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "views": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source."
+      }
+    },
+    "error": null
+  },
+  "chapter": {
+    "fetchStatus": "FOUND",
+    "mangaId": "my-new-family-treats-me-well",
+    "chapterCount": 130,
+    "fetchedAt": "2026-08-11T12:05:05.367Z",
+    "metadata": {
+      "id": "chapter-126-5",
+      "chapNum": 126.5,
+      "langCode": "en",
+      "name": "Chapter 126.5 - Review",
+      "volume": null,
+      "group": "Omega Scans",
+      "time": "2026-07-25T04:00:00.055Z",
+      "sortingIndex": 126.5,
+      "_missing": {
+        "volume": "NOT_FOUND: required Chapter metadata was not returned by the source."
+      }
+    },
+    "details": {
+      "fetchStatus": "FOUND",
+      "fetchedAt": "2026-08-11T12:05:05.368Z",
+      "metadata": {
+        "id": "chapter-126-5",
+        "mangaId": "my-new-family-treats-me-well",
+        "pages": [
+          "https://media.omegascans.org/file/zFSsXt/uploads/series/my-new-family-treats-me-well/1784562884730-7qp9mk/01-kl4rr22zum25o7crlqdsun8f.jpg",
+          "https://media.omegascans.org/file/zFSsXt/uploads/series/my-new-family-treats-me-well/1784562884730-7qp9mk/02-np3xybltafdcbgz4jiasihjk.jpg",
+          "https://media.omegascans.org/file/zFSsXt/uploads/series/my-new-family-treats-me-well/1784562884730-7qp9mk/03-qq8lxv5oxf26uo2adhnxhpw0.jpg",
+          "https://media.omegascans.org/file/zFSsXt/uploads/series/my-new-family-treats-me-well/1784562884730-7qp9mk/04-zqhyouii79v8hwcv5c6ux0k7.jpg",
+          "https://media.omegascans.org/file/zFSsXt/uploads/series/my-new-family-treats-me-well/1784562884730-7qp9mk/05-pdx23otlvepj9uyblebn1nbp.jpg",
+          "https://media.omegascans.org/file/zFSsXt/uploads/series/my-new-family-treats-me-well/1784562884730-7qp9mk/06-pqs5v8biqv71z6jgmti56l92.jpg",
+          "https://media.omegascans.org/file/zFSsXt/uploads/series/my-new-family-treats-me-well/1784562884730-7qp9mk/07-dftkizmeh8z1l3im2ecmpxok.jpg",
+          "https://media.omegascans.org/file/zFSsXt/uploads/series/my-new-family-treats-me-well/1784562884730-7qp9mk/08-pkjvcwkjxh0nbyu3k02j3uew.jpg",
+          "https://media.omegascans.org/file/zFSsXt/uploads/series/my-new-family-treats-me-well/1784562884730-7qp9mk/09-pno88xii96vwstospws16mo8.jpg",
+          "https://media.omegascans.org/file/zFSsXt/uploads/series/my-new-family-treats-me-well/1784562884730-7qp9mk/10-yjiq1yzjjpu3lq8utmvc7oed.jpg",
+          "https://media.omegascans.org/file/zFSsXt/uploads/series/my-new-family-treats-me-well/1784562884730-7qp9mk/11-z2cgx6o6ypd7oug7c9adpi9t.jpg"
+        ],
+        "_missing": {}
+      },
+      "error": null
+    },
+    "error": null
+  }
+}

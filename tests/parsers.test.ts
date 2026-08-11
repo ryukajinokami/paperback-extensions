@@ -4,7 +4,7 @@ import { MangaDistrictParser } from '../src/MangaDistrict/MangaDistrictParser'
 import { LelMangaParser } from '../src/LelManga/LelMangaParser'
 import { AstralMangaParser } from '../src/AstralManga/AstralMangaParser'
 import { MangasOriginesParser } from '../src/MangasOrigines/MangasOriginesParser'
-import { MangasOrigines } from '../src/MangasOrigines/MangasOrigines'
+import { MangasOrigines, MangasOriginesInfo } from '../src/MangasOrigines/MangasOrigines'
 import { OmegaScansParser } from '../src/OmegaScans/OmegaScansParser'
 import { PoseidonScansParser } from '../src/PoseidonScans/PoseidonScansParser'
 import { createReaderError } from '../src/utils/readerError'
@@ -128,6 +128,7 @@ test('PoseidonScans parses free chapters, metadata and reader pages', () => {
   const parser = new PoseidonScansParser('https://poseidon-scans.net')
   const seriesHtml = `
     <script type="application/ld+json">{"@type":"ComicSeries","name":"Example","description":"Description","genre":["Action"],"image":"/api/covers/example.webp"}</script>
+    <script>self.__next_f.push([1,"{\\"type\\":\\"font/woff2\\"}"])</script>
     <script>self.__next_f.push([1,"{\\"type\\":\\"MANHWA\\",\\"status\\":\\"en cours\\",\\"viewCount\\":1234,\\"releaseYear\\":2025,\\"alternativeNames\\":\\"Example Alt | Exemple\\",\\"_count\\":{\\"favorites\\":42},\\"chapters\\":[{\\"id\\":\\"free\\",\\"number\\":1,\\"title\\":null,\\"createdAt\\":\\"$D2026-01-01T00:00:00.000Z\\",\\"isPremium\\":false,\\"premiumUntil\\":null},{\\"id\\":\\"paid\\",\\"number\\":2,\\"title\\":null,\\"createdAt\\":\\"$D2026-01-02T00:00:00.000Z\\",\\"isPremium\\":true,\\"premiumUntil\\":null}]}"])</script>
   `
   const info = parser.parseMangaDetails('example', seriesHtml) as unknown as { titles: string[], additionalInfo: Record<string, string> }
@@ -199,7 +200,42 @@ test('Epsilon-compatible parser uses the selected source name and routes', () =>
   assert.equal(parser.buildChapterUrl('regas', '98'), 'https://epsilonsoft.to/serie/regas/chapter/98')
 })
 
+test('chapter date fallbacks do not invent the current date', () => {
+  const hasTime = (chapter: unknown): boolean => Object.prototype.hasOwnProperty.call(chapter, 'time')
+  const omega = new OmegaScansParser('https://omegascans.org', 'https://api.omegascans.org')
+  const mangaDistrict = new MangaDistrictParser('https://mangadistrict.com')
+  const mangasOrigines = new MangasOriginesParser('https://mangas-origines.fr')
+  const poseidon = new PoseidonScansParser('https://poseidon-scans.net')
+  const epsilon = new PoseidonScansParser('https://epsilonsoft.to', 'Epsilon Soft')
+  const lelManga = new LelMangaParser('https://www.lelmanga.com')
+  const astral = new AstralMangaParser('https://astral-manga.fr')
+
+  const omegaChapters = omega.parseChapters({ data: [{ id: 1, chapter_name: 'Chapter 1', chapter_slug: 'chapter-1', created_at: 'not a date' }] })
+  assert.equal(hasTime(omegaChapters[0]), false)
+
+  const districtChapters = mangaDistrict.parseChapters('example', '<li class="wp-manga-chapter"><a href="https://mangadistrict.com/series/example/chapter-1/">Chapter 1</a><span class="timediff"><i>not a date</i></span></li>')
+  assert.equal(hasTime(districtChapters[0]), false)
+
+  const originChapters = mangasOrigines.parseChapters('example', '<div class="ori-chl-row"><a class="ori-chl-lire" href="https://mangas-origines.fr/oeuvre/example/chapitre-1/">Chapitre 1</a></div>')
+  assert.equal(hasTime(originChapters[0]), false)
+  assert.equal(hasTime(mangasOrigines.parseChapterRange('example', '<a class="ori-chl-lire" href="https://mangas-origines.fr/oeuvre/example/chapitre-3/">Chapitre 3</a>')[0]), false)
+
+  const poseidonChapters = poseidon.parseChapters('example', '<a href="/serie/example/chapter/1"><h3>Chapitre 1</h3></a>')
+  assert.equal(hasTime(poseidonChapters[0]), false)
+
+  const epsilonChapters = epsilon.parseChapters('example', '<a href="/serie/example/chapter/1"><h3>Chapitre 1</h3></a>')
+  assert.equal(epsilonChapters[0]?.group, 'Epsilon Soft')
+  assert.equal(hasTime(epsilonChapters[0]), false)
+
+  const lelChapters = lelManga.parseChapters('manga/example', '<div class="eplister"><ul><li data-num="1"><a href="/example-1"><span class="chapternum">Chapitre 1</span><span class="chapterdate">not a date</span></a></li></ul></div>')
+  assert.equal(hasTime(lelChapters[0]), false)
+
+  const astralChapters = astral.parseChapters('01b2c442-e484-4d77-a07a-c2714b718d24', '<a href="/manga/01b2c442-e484-4d77-a07a-c2714b718d24/chapter/293db8d9-6f01-4911-b6f1-045298b20c79">Chapitre 173</a>')
+  assert.equal(hasTime(astralChapters[0]), false)
+})
+
 test('Mangas Origines supports its customized Madara routes and WordPress reader', () => {
+  assert.equal(MangasOriginesInfo.contentRating, 'MATURE')
   const parser = new MangasOriginesParser('https://mangas-origines.fr')
   const catalogue = `<div class="ori-listing-grid ori-cat-grid">
     <a class="ori-card ori-cat-card" href="https://mangas-origines.fr/oeuvre/example/">
@@ -209,14 +245,23 @@ test('Mangas Origines supports its customized Madara routes and WordPress reader
   </div>`
   const chapters = `<div class="ori-chl-row">
     <a class="ori-chl-lire" href="https://mangas-origines.fr/oeuvre/example/chapitre-1/">Chapitre 1</a>
+    <span class="ori-chl-date">9 août 2026</span>
+  </div>
+  <div class="ori-chl-row">
+    <span class="ori-chl-date">10/08/2026</span>
     <a class="ori-chl-lire" href="https://mangas-origines.fr/oeuvre/example/chapitre-12/">Chapitre 12</a>
   </div>`
   const series = `<link rel="canonical" href="https://mangas-origines.fr/oeuvre/example/">
     <meta property="og:image" content="https://mangas-origines.fr/wp-content/uploads/example.webp">
     <div class="post-title"><h1>Example</h1></div>
-    <div class="ori-sr-signature"><a>Example Author</a></div>
+    <div class="ori-sr-signature"><a>Signature Fallback</a></div>
     <div class="ori-sr-genres"><a href="https://mangas-origines.fr/manga-genres/action/">Action</a></div>
-    <div class="ori-sr-infos"><dl><dt>Statut</dt><dd>En cours</dd><dt>Type</dt><dd>Manhwa</dd></dl></div>
+    <div class="ori-sr-infos"><dl>
+      <dt>Statut</dt><dd>En cours</dd>
+      <dt>Type</dt><dd>Manhwa</dd>
+      <dt>Sc&eacute;nario</dt><dd><a>Example Author</a></dd>
+      <dt>Dessin</dt><dd><a>Example Artist</a></dd>
+    </dl></div>
     <div class="ori-sr-syn-texte"><p>Modern synopsis.</p></div>`
   const filters = '<label class="ori-fcheck"><input type="checkbox" value="action"><span class="ori-flabel">Action</span></label>'
   const reader = '<div class="reading-content"><img class="wp-manga-chapter-img" data-src="https://mangas-origines.fr/wp-content/uploads/example/chapter-1/001.webp"></div>'
@@ -233,9 +278,12 @@ test('Mangas Origines supports its customized Madara routes and WordPress reader
   assert.equal(results.results[0]?.image, 'https://mangas-origines.fr/wp-content/uploads/example.webp')
   assert.equal(chapterResults.at(-1)?.id, 'chapitre-12')
   assert.equal(chapterResults.at(-1)?.chapNum, 12)
+  assert.equal(chapterResults[0]?.time?.getTime(), new Date(2026, 7, 9).getTime())
+  assert.equal(chapterResults.at(-1)?.time?.getTime(), new Date(2026, 7, 10).getTime())
   assert.equal(chapterFallback.length, 12)
   assert.equal(redirectedSearch.results[0]?.mangaId, 'example')
   assert.equal(info.author, 'Example Author')
+  assert.equal(info.artist, 'Example Artist')
   assert.equal(info.status, 'En cours')
   assert.equal(info.desc, 'Modern synopsis.')
   assert.equal(info.tags[0]?.tags[0]?.id, 'action')

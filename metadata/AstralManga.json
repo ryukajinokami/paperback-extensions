@@ -1,0 +1,147 @@
+{
+  "id": "AstralManga",
+  "version": "2026.8.11.19",
+  "name": "Astral Manga",
+  "icon": "icon.png",
+  "author": "Paperback Community",
+  "description": "French Astral Manga source for its UUID-based catalogue and public chapters.",
+  "contentRating": "ADULT",
+  "websiteBaseURL": "https://astral-manga.fr",
+  "authorWebsite": null,
+  "language": "French",
+  "sourceTags": [
+    {
+      "text": "French",
+      "type": "default"
+    },
+    {
+      "text": "Manga",
+      "type": "success"
+    },
+    {
+      "text": "Manhwa",
+      "type": "info"
+    }
+  ],
+  "intents": 21,
+  "intentNames": [
+    "MANGA_CHAPTERS",
+    "HOMEPAGE_SECTIONS",
+    "CLOUDFLARE_BYPASS_REQUIRED"
+  ],
+  "_missing": {
+    "authorWebsite": "NOT_FOUND: optional Paperback metadata is not configured."
+  },
+  "_contract": "@paperback/types SourceInfo, MangaInfo, Chapter and ChapterDetails 0.8.0-alpha.38",
+  "manga": {
+    "fetchStatus": "FOUND",
+    "mangaId": "01b2c442-e484-4d77-a07a-c2714b718d24",
+    "shareUrl": "https://astral-manga.fr/manga/01b2c442-e484-4d77-a07a-c2714b718d24",
+    "fetchedAt": "2026-08-11T12:05:26.050Z",
+    "metadata": {
+      "image": "https://astral-manga.fr/_next/static/chunks/4bd1b696-100b9d70ed4e49c1.js",
+      "artist": "Unknown",
+      "author": "Unknown",
+      "desc": "$1e",
+      "status": "ON_GOING",
+      "hentai": false,
+      "titles": [
+        "Standard of Reincarnation"
+      ],
+      "banner": null,
+      "rating": null,
+      "tags": [],
+      "covers": [
+        "https://astral-manga.fr/_next/static/chunks/4bd1b696-100b9d70ed4e49c1.js"
+      ],
+      "additionalInfo": {
+        "Type": "font/woff2"
+      },
+      "avgRating": null,
+      "follows": null,
+      "langFlag": null,
+      "langName": null,
+      "users": null,
+      "views": null,
+      "_missing": {
+        "artist": "NOT_FOUND: required MangaInfo metadata was not returned by the source.",
+        "author": "NOT_FOUND: required MangaInfo metadata was not returned by the source.",
+        "banner": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "rating": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "tags": "NOT_FOUND: required MangaInfo metadata was not returned by the source.",
+        "avgRating": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "follows": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "langFlag": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "langName": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "users": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "views": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source."
+      }
+    },
+    "error": null
+  },
+  "chapter": {
+    "fetchStatus": "FOUND",
+    "mangaId": "01b2c442-e484-4d77-a07a-c2714b718d24",
+    "chapterCount": 41,
+    "fetchedAt": "2026-08-11T12:05:28.669Z",
+    "metadata": {
+      "id": "293db8d9-6f01-4911-b6f1-045298b20c79",
+      "chapNum": 173,
+      "langCode": "fr",
+      "name": "Chapitre 173",
+      "volume": null,
+      "group": "Astral Manga",
+      "time": null,
+      "sortingIndex": 173,
+      "_missing": {
+        "volume": "NOT_FOUND: required Chapter metadata was not returned by the source.",
+        "time": "NOT_FOUND: required Chapter metadata was not returned by the source."
+      }
+    },
+    "details": {
+      "fetchStatus": "FOUND",
+      "fetchedAt": "2026-08-11T12:05:28.669Z",
+      "metadata": {
+        "id": "293db8d9-6f01-4911-b6f1-045298b20c79",
+        "mangaId": "01b2c442-e484-4d77-a07a-c2714b718d24",
+        "pages": [
+          "https://astral-manga.fr/_next/static/chunks/4bd1b696-100b9d70ed4e49c1.js",
+          "https://astral-manga.fr/_next/static/chunks/1255-55f5611cfd370a3f.js",
+          "https://astral-manga.fr/_next/static/chunks/main-app-f3336e172256d2ab.js",
+          "https://astral-manga.fr/_next/static/chunks/4744-1394f6facc1af9f3.js",
+          "https://astral-manga.fr/_next/static/chunks/4657-5380611eecc6ad3a.js",
+          "https://astral-manga.fr/_next/static/chunks/2344-88d0335557ab08c6.js",
+          "https://astral-manga.fr/_next/static/chunks/1356-5c8c2e2fb753b8c7.js",
+          "https://astral-manga.fr/_next/static/chunks/3998-af72b08025b88d03.js",
+          "https://astral-manga.fr/_next/static/chunks/2680-ef7601a8656114a4.js",
+          "https://astral-manga.fr/_next/static/chunks/8732-7846863b974aec34.js",
+          "https://astral-manga.fr/_next/static/chunks/7513-ab1b52d80bdcaeca.js",
+          "https://astral-manga.fr/_next/static/chunks/2619-b8db57ac19da49ac.js",
+          "https://astral-manga.fr/_next/static/chunks/1204-9789063534389a73.js",
+          "https://astral-manga.fr/_next/static/chunks/8623-fc29939f8d926f4d.js",
+          "https://astral-manga.fr/_next/static/chunks/4948-429993000b48d361.js",
+          "https://astral-manga.fr/_next/static/chunks/5665-036527c3768df0af.js",
+          "https://astral-manga.fr/_next/static/chunks/2218-d880746128c1cfbe.js",
+          "https://astral-manga.fr/_next/static/chunks/5131-516dbf82f2443813.js",
+          "https://astral-manga.fr/_next/static/chunks/6852-665de54e33967dab.js",
+          "https://astral-manga.fr/_next/static/chunks/8148-d4a9c57a68c40704.js",
+          "https://astral-manga.fr/_next/static/chunks/5994-88aeb9b8ccb51b34.js",
+          "https://astral-manga.fr/_next/static/chunks/6708-68f7f1297af899af.js",
+          "https://astral-manga.fr/_next/static/chunks/aaea2bcf-cf0380b469290346.js",
+          "https://astral-manga.fr/_next/static/chunks/7930-4e7202ba62c2bcc5.js",
+          "https://astral-manga.fr/_next/static/chunks/666-d184993afd9a0bcb.js",
+          "https://astral-manga.fr/_next/static/chunks/390-ca99cf6d930ce61d.js",
+          "https://astral-manga.fr/_next/static/chunks/704-2dcef3535f4115c1.js",
+          "https://astral-manga.fr/_next/static/chunks/203-baa64048cae7f14b.js",
+          "https://astral-manga.fr/_next/static/chunks/5735-20d644cb5b0cf695.js",
+          "https://astral-manga.fr/_next/static/chunks/1360-a218bb77c8532b23.js",
+          "https://astral-manga.fr/_next/static/chunks/polyfills-42372ed130431b0a.js",
+          "https://astral-manga.fr/_next/static/chunks/webpack-f7089348ec5bc92e.js"
+        ],
+        "_missing": {}
+      },
+      "error": null
+    },
+    "error": null
+  }
+}

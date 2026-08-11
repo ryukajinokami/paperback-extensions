@@ -1,0 +1,122 @@
+{
+  "id": "EpsilonSoft",
+  "version": "2026.8.11.19",
+  "name": "Epsilon Soft",
+  "icon": "icon.png",
+  "author": "Paperback Community",
+  "description": "Epsilon Soft source for Paperback v0.8. Supports French catalogue search, details, free chapters and reader pages.",
+  "contentRating": "MATURE",
+  "websiteBaseURL": "https://epsilonsoft.to",
+  "authorWebsite": null,
+  "language": "French",
+  "sourceTags": [
+    {
+      "text": "French",
+      "type": "default"
+    },
+    {
+      "text": "Manga",
+      "type": "success"
+    },
+    {
+      "text": "Manhwa",
+      "type": "info"
+    }
+  ],
+  "intents": 21,
+  "intentNames": [
+    "MANGA_CHAPTERS",
+    "HOMEPAGE_SECTIONS",
+    "CLOUDFLARE_BYPASS_REQUIRED"
+  ],
+  "_missing": {
+    "authorWebsite": "NOT_FOUND: optional Paperback metadata is not configured."
+  },
+  "_contract": "@paperback/types SourceInfo, MangaInfo, Chapter and ChapterDetails 0.8.0-alpha.38",
+  "manga": {
+    "fetchStatus": "FOUND",
+    "mangaId": "regas",
+    "shareUrl": "https://epsilonsoft.to/serie/regas",
+    "fetchedAt": "2026-08-11T12:05:16.547Z",
+    "metadata": {
+      "image": "https://epsilonsoft.to/storage/series/covers/H9EnVbivS7sG.jpg?v=1786447988",
+      "artist": "Unknown",
+      "author": "Unknown",
+      "desc": "Dans ce royaume où le pouvoir du dragon se transmet de génération en génération aux membres de la famille royale, chaque héritier du pouvoir a besoin, pour l’assister, d’un « dresseur de dragons », aussi connu sous le nom de « Regas ». Le nouveau prince, qui semble porter en lui les marques d’un dragon particulièrement puissant, terrifie tout le monde de par son agressivité. Alors que tous le fuient, Abel, un jeune homme formé aux usages des Regas, se rapproche de lui et lui enseigne les choses du monde peu à peu. Le petit prince pourra-t-il un jour baisser sa garde et ouvrir son cœur au jeune Regas ? Et surtout, parviendra-t-il à contrôler ses pouvoirs alors que tant de gens complotent dans l’ombre ?",
+      "status": "Unknown",
+      "hentai": false,
+      "titles": [
+        "Regas"
+      ],
+      "banner": "https://epsilonsoft.to/api/banners-mangas/regas.webp",
+      "rating": null,
+      "tags": [],
+      "covers": [
+        "https://epsilonsoft.to/storage/series/covers/H9EnVbivS7sG.jpg?v=1786447988"
+      ],
+      "additionalInfo": {},
+      "avgRating": null,
+      "follows": null,
+      "langFlag": null,
+      "langName": null,
+      "users": null,
+      "views": null,
+      "_missing": {
+        "artist": "NOT_FOUND: required MangaInfo metadata was not returned by the source.",
+        "author": "NOT_FOUND: required MangaInfo metadata was not returned by the source.",
+        "status": "NOT_FOUND: required MangaInfo metadata was not returned by the source.",
+        "rating": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "tags": "NOT_FOUND: required MangaInfo metadata was not returned by the source.",
+        "avgRating": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "follows": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "langFlag": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "langName": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "users": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "views": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source."
+      }
+    },
+    "error": null
+  },
+  "chapter": {
+    "fetchStatus": "ERROR",
+    "mangaId": "regas",
+    "chapterCount": null,
+    "fetchedAt": "2026-08-11T12:05:16.648Z",
+    "metadata": {
+      "id": null,
+      "chapNum": null,
+      "langCode": null,
+      "name": null,
+      "volume": null,
+      "group": null,
+      "time": null,
+      "sortingIndex": null,
+      "_missing": {
+        "id": "NOT_FOUND: live chapter request error.",
+        "chapNum": "NOT_FOUND: live chapter request error.",
+        "langCode": "NOT_FOUND: live chapter request error.",
+        "name": "NOT_FOUND: live chapter request error.",
+        "volume": "NOT_FOUND: live chapter request error.",
+        "group": "NOT_FOUND: live chapter request error.",
+        "time": "NOT_FOUND: live chapter request error.",
+        "sortingIndex": "NOT_FOUND: live chapter request error."
+      }
+    },
+    "details": {
+      "fetchStatus": "ERROR",
+      "fetchedAt": "2026-08-11T12:05:16.649Z",
+      "metadata": {
+        "id": null,
+        "mangaId": null,
+        "pages": null,
+        "_missing": {
+          "id": "NOT_FOUND: live chapter details request error.",
+          "mangaId": "NOT_FOUND: live chapter details request error.",
+          "pages": "NOT_FOUND: live chapter details request error."
+        }
+      },
+      "error": "EpsilonSoft: chapter list is empty"
+    },
+    "error": "EpsilonSoft: chapter list is empty"
+  }
+}

@@ -45,7 +45,7 @@ export const MangasOriginesInfo: SourceInfo = {
   name: 'Mangas Origines',
   author: 'Paperback Community',
   description: 'French Mangas Origines source with Madara catalogue filters, details and public reader pages.',
-  contentRating: ContentRating.ADULT,
+  contentRating: ContentRating.MATURE,
   icon: 'icon.png',
   version: BUILD_VERSION,
   websiteBaseURL: BASE_URL,

@@ -74,7 +74,7 @@ export class AstralMangaParser {
       const name = this.clean(/Chapitre\s*\d+(?:\.\d+)?(?:\s*[-–][^<"}]*)?/i.exec(this.clean(block))?.[0] ?? this.value(block, ['title', 'name', 'number']))
       const chapNum = Number(/\d+(?:\.\d+)?/.exec(name)?.[0] ?? 0)
       seen[id] = true
-      chapters.push(App.createChapter({ id, chapNum, name: name || `Chapitre ${chapNum}`, langCode: 'fr', group: 'Astral Manga', time: new Date(), sortingIndex: chapNum }))
+      chapters.push(App.createChapter({ id, chapNum, name: name || `Chapitre ${chapNum}`, langCode: 'fr', group: 'Astral Manga', sortingIndex: chapNum }))
     }
 
     return chapters.sort((left, right) => left.chapNum - right.chapNum)

@@ -1,0 +1,151 @@
+{
+  "id": "MangasOrigines",
+  "version": "2026.8.11.19",
+  "name": "Mangas Origines",
+  "icon": "icon.png",
+  "author": "Paperback Community",
+  "description": "French Mangas Origines source with Madara catalogue filters, details and public reader pages.",
+  "contentRating": "MATURE",
+  "websiteBaseURL": "https://mangas-origines.fr",
+  "authorWebsite": null,
+  "language": "French",
+  "sourceTags": [
+    {
+      "text": "French",
+      "type": "default"
+    },
+    {
+      "text": "Madara",
+      "type": "success"
+    }
+  ],
+  "intents": 21,
+  "intentNames": [
+    "MANGA_CHAPTERS",
+    "HOMEPAGE_SECTIONS",
+    "CLOUDFLARE_BYPASS_REQUIRED"
+  ],
+  "_missing": {
+    "authorWebsite": "NOT_FOUND: optional Paperback metadata is not configured."
+  },
+  "_contract": "@paperback/types SourceInfo, MangaInfo, Chapter and ChapterDetails 0.8.0-alpha.38",
+  "manga": {
+    "fetchStatus": "FOUND",
+    "mangaId": "826-solo-leveling",
+    "shareUrl": "https://mangas-origines.fr/oeuvre/826-solo-leveling/",
+    "fetchedAt": "2026-08-11T12:05:32.340Z",
+    "metadata": {
+      "image": "https://mangas-origines.fr/wp-content/uploads/2023/06/solo-leveling-vol-3-comic.jpg",
+      "artist": "Unknown",
+      "author": "Chugong · DUBU",
+      "desc": "Depuis qu’un portail connectant notre monde à un monde peuplé de monstres et de créatures en tout genre est apparu, des personnes « ordinaires » ont acquis la capacité de chasser ces derniers. On les appelle les chasseurs. Vous pensez qu’ils sont tous balaises ? Qu’ils sont des héros, des aventuriers comme on en voit dans les mangas ? Eh bien malheureusement pas tous. Sung Jin-Woo est le plus faible des chasseurs de rang E, autrement dit, le plus faible parmi les faibles. Il est donc surnommé par ses confrères chasseurs « le faible ». En-tout-cas, il l’était, jusqu’à ce qu’il se retrouve piégé dans un donjon et y acquière une capacité… étrange. Il peut désormais voir une interface lui montrant des quêtes. Va-t-il réussir à devenir le plus puissant des chasseurs ?",
+      "status": "Terminé",
+      "hentai": false,
+      "titles": [
+        "Solo Leveling"
+      ],
+      "banner": null,
+      "rating": 4.8,
+      "tags": [
+        {
+          "id": "genres",
+          "label": "Genres",
+          "tags": [
+            {
+              "id": "action",
+              "label": "Action"
+            },
+            {
+              "id": "aventure",
+              "label": "Aventure"
+            },
+            {
+              "id": "combat",
+              "label": "Combat"
+            },
+            {
+              "id": "comedie",
+              "label": "Comédie"
+            },
+            {
+              "id": "drame",
+              "label": "Drame"
+            },
+            {
+              "id": "ecchi",
+              "label": "Ecchi"
+            }
+          ]
+        }
+      ],
+      "covers": [
+        "https://mangas-origines.fr/wp-content/uploads/2023/06/solo-leveling-vol-3-comic.jpg"
+      ],
+      "additionalInfo": {
+        "Type": "Manhwa",
+        "Status": "Terminé"
+      },
+      "avgRating": null,
+      "follows": null,
+      "langFlag": null,
+      "langName": null,
+      "users": null,
+      "views": null,
+      "_missing": {
+        "artist": "NOT_FOUND: required MangaInfo metadata was not returned by the source.",
+        "banner": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "avgRating": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "follows": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "langFlag": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "langName": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "users": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "views": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source."
+      }
+    },
+    "error": null
+  },
+  "chapter": {
+    "fetchStatus": "FOUND",
+    "mangaId": "826-solo-leveling",
+    "chapterCount": 203,
+    "fetchedAt": "2026-08-11T12:05:33.204Z",
+    "metadata": {
+      "id": "chapitre-200",
+      "chapNum": 200,
+      "langCode": "fr",
+      "name": "Chapitre 200",
+      "volume": null,
+      "group": "Mangas Origines",
+      "time": "2023-06-20T22:00:00.000Z",
+      "sortingIndex": 200,
+      "_missing": {
+        "volume": "NOT_FOUND: required Chapter metadata was not returned by the source."
+      }
+    },
+    "details": {
+      "fetchStatus": "FOUND",
+      "fetchedAt": "2026-08-11T12:05:33.204Z",
+      "metadata": {
+        "id": "chapitre-200",
+        "mangaId": "826-solo-leveling",
+        "pages": [
+          "https://mangas-origines.fr/wp-content/uploads/WP-manga/data/manga_649064bd0c0db/9626520b2f07ca46b35c19b1f309e806/01.jpg",
+          "https://mangas-origines.fr/wp-content/uploads/WP-manga/data/manga_649064bd0c0db/9626520b2f07ca46b35c19b1f309e806/02.jpg",
+          "https://mangas-origines.fr/wp-content/uploads/WP-manga/data/manga_649064bd0c0db/9626520b2f07ca46b35c19b1f309e806/03.jpg",
+          "https://mangas-origines.fr/wp-content/uploads/WP-manga/data/manga_649064bd0c0db/9626520b2f07ca46b35c19b1f309e806/04.jpg",
+          "https://mangas-origines.fr/wp-content/uploads/WP-manga/data/manga_649064bd0c0db/9626520b2f07ca46b35c19b1f309e806/05.jpg",
+          "https://mangas-origines.fr/wp-content/uploads/WP-manga/data/manga_649064bd0c0db/9626520b2f07ca46b35c19b1f309e806/06.jpg",
+          "https://mangas-origines.fr/wp-content/uploads/WP-manga/data/manga_649064bd0c0db/9626520b2f07ca46b35c19b1f309e806/07.jpg",
+          "https://mangas-origines.fr/wp-content/uploads/WP-manga/data/manga_649064bd0c0db/9626520b2f07ca46b35c19b1f309e806/08.jpg",
+          "https://mangas-origines.fr/wp-content/uploads/WP-manga/data/manga_649064bd0c0db/9626520b2f07ca46b35c19b1f309e806/09.jpg",
+          "https://mangas-origines.fr/wp-content/uploads/WP-manga/data/manga_649064bd0c0db/9626520b2f07ca46b35c19b1f309e806/10.jpg",
+          "https://mangas-origines.fr/wp-content/uploads/WP-manga/data/manga_649064bd0c0db/9626520b2f07ca46b35c19b1f309e806/11.jpg",
+          "https://mangas-origines.fr/wp-content/uploads/WP-manga/data/manga_649064bd0c0db/9626520b2f07ca46b35c19b1f309e806/12.jpg"
+        ],
+        "_missing": {}
+      },
+      "error": null
+    },
+    "error": null
+  }
+}

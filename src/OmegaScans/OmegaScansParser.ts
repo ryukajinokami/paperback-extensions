@@ -2,6 +2,7 @@ import { Chapter, ChapterDetails, MangaInfo, PagedResults, PartialSourceManga, T
 import { OmegaChapter, OmegaListResponse, OmegaSeries, OmegaTag } from './models'
 import { createReaderError } from '../utils/readerError'
 import { normalizeHttpUrl } from '../utils/url'
+import { parseDateOrUndefined } from '../utils/date'
 
 export class OmegaScansParser {
   constructor(
@@ -39,15 +40,20 @@ export class OmegaScansParser {
   parseChapters(response: OmegaListResponse<OmegaChapter>): Chapter[] {
     return response.data
       .filter(chapter => (chapter.price ?? 0) <= 0)
-      .map(chapter => App.createChapter({
-        id: chapter.chapter_slug,
-        chapNum: this.chapterNumber(chapter),
-        name: this.chapterName(chapter),
-        langCode: 'en',
-        group: 'Omega Scans',
-        time: this.parseDate(chapter.created_at),
-        sortingIndex: this.chapterNumber(chapter)
-      }))
+      .map(chapter => {
+        const chapNum = this.chapterNumber(chapter)
+        const time = this.parseDate(chapter.created_at)
+
+        return App.createChapter({
+          id: chapter.chapter_slug,
+          chapNum,
+          name: this.chapterName(chapter),
+          langCode: 'en',
+          group: 'Omega Scans',
+          ...(time ? { time } : {}),
+          sortingIndex: chapNum
+        })
+      })
       .sort((left, right) => left.chapNum - right.chapNum)
   }
 
@@ -367,13 +373,8 @@ export class OmegaScansParser {
     return nameMatch?.[1] ? Number(nameMatch[1]) : 0
   }
 
-  private parseDate(value?: string): Date {
-    if (!value) {
-      return new Date()
-    }
-
-    const parsed = new Date(value)
-    return Number.isNaN(parsed.getTime()) ? new Date() : parsed
+  private parseDate(value?: string): Date | undefined {
+    return parseDateOrUndefined(value)
   }
 
   private cleanHtml(value: string): string {

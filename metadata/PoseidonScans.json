@@ -1,0 +1,179 @@
+{
+  "id": "PoseidonScans",
+  "version": "2026.8.11.19",
+  "name": "Poseidon Scans",
+  "icon": "icon.png",
+  "author": "Paperback Community",
+  "description": "Poseidon Scans source for Paperback v0.8. Supports French catalogue search, details, free chapters and reader pages.",
+  "contentRating": "MATURE",
+  "websiteBaseURL": "https://poseidon-scans.net",
+  "authorWebsite": null,
+  "language": "French",
+  "sourceTags": [
+    {
+      "text": "French",
+      "type": "default"
+    },
+    {
+      "text": "Manga",
+      "type": "success"
+    },
+    {
+      "text": "Manhwa",
+      "type": "info"
+    }
+  ],
+  "intents": 5,
+  "intentNames": [
+    "MANGA_CHAPTERS",
+    "HOMEPAGE_SECTIONS"
+  ],
+  "_missing": {
+    "authorWebsite": "NOT_FOUND: optional Paperback metadata is not configured."
+  },
+  "_contract": "@paperback/types SourceInfo, MangaInfo, Chapter and ChapterDetails 0.8.0-alpha.38",
+  "manga": {
+    "fetchStatus": "FOUND",
+    "mangaId": "solo-farming-in-the-tower",
+    "shareUrl": "https://poseidon-scans.net/serie/solo-farming-in-the-tower",
+    "fetchedAt": "2026-08-11T12:05:06.185Z",
+    "metadata": {
+      "image": "https://poseidon-scans.net/api/covers/solo-farming-in-the-tower.webp",
+      "artist": "Unknown",
+      "author": "Unknown",
+      "desc": "Un beau jour, une tour mystérieuse apparut soudainement dans la ville. Les habitants décidèrent de l’appeler « donjon », et bien qu’elle soit remplie de terrains accidentés et de monstres dangereux, c’est aussi une terre d’opportunités, où d’innombrables trésors attendent. Lorsque Sejun, un jeune homme à la vie ordinaire, est invité par hasard dans le donjon, il est ravi à l’idée de devenir riche, mais il se retrouve coincé dans une zone cachée de la mystérieuse tour. Tout ce qu’il possède, ce sont quelques graines et son corps. Sejun doit maintenant cultiver, collecter des ressources et trouver sa propre stratégie de survie !",
+      "status": "en cours",
+      "hentai": false,
+      "titles": [
+        "Solo Farming In The Tower"
+      ],
+      "banner": "https://poseidon-scans.net/api/banners-mangas/solo-farming-in-the-tower.webp",
+      "rating": 4.9,
+      "tags": [
+        {
+          "id": "genres",
+          "label": "Genres",
+          "tags": [
+            {
+              "id": "amitie",
+              "label": "Amitié"
+            },
+            {
+              "id": "fantaisie",
+              "label": "Fantaisie"
+            },
+            {
+              "id": "combat",
+              "label": "Combat"
+            },
+            {
+              "id": "aventure",
+              "label": "Aventure"
+            },
+            {
+              "id": "isekai",
+              "label": "Isekai"
+            },
+            {
+              "id": "action",
+              "label": "Action"
+            }
+          ]
+        }
+      ],
+      "covers": [
+        "https://poseidon-scans.net/api/covers/solo-farming-in-the-tower.webp"
+      ],
+      "additionalInfo": {
+        "Type": "MANHWA",
+        "Views": "285666",
+        "Favorites": "1211"
+      },
+      "avgRating": null,
+      "follows": null,
+      "langFlag": null,
+      "langName": null,
+      "users": null,
+      "views": null,
+      "_missing": {
+        "artist": "NOT_FOUND: required MangaInfo metadata was not returned by the source.",
+        "author": "NOT_FOUND: required MangaInfo metadata was not returned by the source.",
+        "avgRating": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "follows": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "langFlag": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "langName": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "users": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "views": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source."
+      }
+    },
+    "error": null
+  },
+  "chapter": {
+    "fetchStatus": "FOUND",
+    "mangaId": "solo-farming-in-the-tower",
+    "chapterCount": 120,
+    "fetchedAt": "2026-08-11T12:05:06.872Z",
+    "metadata": {
+      "id": "120",
+      "chapNum": 120,
+      "langCode": "fr",
+      "name": "Chapitre 120",
+      "volume": null,
+      "group": "Poseidon Scans",
+      "time": "2026-08-09T17:00:00.000Z",
+      "sortingIndex": 120,
+      "_missing": {
+        "volume": "NOT_FOUND: required Chapter metadata was not returned by the source."
+      }
+    },
+    "details": {
+      "fetchStatus": "FOUND",
+      "fetchedAt": "2026-08-11T12:05:06.872Z",
+      "metadata": {
+        "id": "120",
+        "mangaId": "solo-farming-in-the-tower",
+        "pages": [
+          "https://poseidon-scans.net/api/chapters/solo-farming-in-the-tower/cmrif7a0t00bn01pe7a07c1jl/c5c765e6-251f-4cf6-a744-f6bf714557b7",
+          "https://poseidon-scans.net/api/chapters/solo-farming-in-the-tower/cmrif7a0t00bn01pe7a07c1jl/8a8c89c3-2cb0-47a7-b54b-813b98227e32",
+          "https://poseidon-scans.net/api/chapters/solo-farming-in-the-tower/cmrif7a0t00bn01pe7a07c1jl/aaa385d0-99e4-4961-aeef-4b91b4e9b272",
+          "https://poseidon-scans.net/api/chapters/solo-farming-in-the-tower/cmrif7a0t00bn01pe7a07c1jl/c91dc394-0ec3-42d3-a3f3-9ec2e82a82fe",
+          "https://poseidon-scans.net/api/chapters/solo-farming-in-the-tower/cmrif7a0t00bn01pe7a07c1jl/ea29fd5a-1757-49e8-90f0-eb3fc5a4519f",
+          "https://poseidon-scans.net/api/chapters/solo-farming-in-the-tower/cmrif7a0t00bn01pe7a07c1jl/d9961730-a90d-4ac5-9a62-538219d4655f",
+          "https://poseidon-scans.net/api/chapters/solo-farming-in-the-tower/cmrif7a0t00bn01pe7a07c1jl/a0f23742-4060-427b-9b1a-6545e037c70c",
+          "https://poseidon-scans.net/api/chapters/solo-farming-in-the-tower/cmrif7a0t00bn01pe7a07c1jl/91c97e19-ccbf-40ba-8542-ce3388fdd415",
+          "https://poseidon-scans.net/api/chapters/solo-farming-in-the-tower/cmrif7a0t00bn01pe7a07c1jl/36b5c84d-7937-4180-bfc7-6104b86d97e4",
+          "https://poseidon-scans.net/api/chapters/solo-farming-in-the-tower/cmrif7a0t00bn01pe7a07c1jl/07a4ab9a-326a-4afa-bb38-a602fc6ea1db",
+          "https://poseidon-scans.net/api/chapters/solo-farming-in-the-tower/cmrif7a0t00bn01pe7a07c1jl/5e193b20-b450-43b4-aa15-9e7378e28a7f",
+          "https://poseidon-scans.net/api/chapters/solo-farming-in-the-tower/cmrif7a0t00bn01pe7a07c1jl/7e771cdb-6291-4a3a-828c-7d2ded9d1076",
+          "https://poseidon-scans.net/api/chapters/solo-farming-in-the-tower/cmrif7a0t00bn01pe7a07c1jl/93bbadbd-a97c-48fc-b013-e6f7d5b351cd",
+          "https://poseidon-scans.net/api/chapters/solo-farming-in-the-tower/cmrif7a0t00bn01pe7a07c1jl/c53b0863-16ff-4556-9cd7-faa45fb19b4a",
+          "https://poseidon-scans.net/api/chapters/solo-farming-in-the-tower/cmrif7a0t00bn01pe7a07c1jl/a6f59c7a-4013-48f1-9cdd-e3ee50a9e497",
+          "https://poseidon-scans.net/api/chapters/solo-farming-in-the-tower/cmrif7a0t00bn01pe7a07c1jl/eb89ab19-5c6c-4d4d-8d89-b6478075da98",
+          "https://poseidon-scans.net/api/chapters/solo-farming-in-the-tower/cmrif7a0t00bn01pe7a07c1jl/ada6a840-27c0-46c9-92f7-d9f506db62d6",
+          "https://poseidon-scans.net/api/chapters/solo-farming-in-the-tower/cmrif7a0t00bn01pe7a07c1jl/3b4b8325-f3c9-4fa3-bfa5-3bb9e06cfe84",
+          "https://poseidon-scans.net/api/chapters/solo-farming-in-the-tower/cmrif7a0t00bn01pe7a07c1jl/bdab980a-d8a1-430d-8127-1720dd3802e9",
+          "https://poseidon-scans.net/api/chapters/solo-farming-in-the-tower/cmrif7a0t00bn01pe7a07c1jl/69eb74c2-c231-41ca-957e-71b769962462",
+          "https://poseidon-scans.net/api/chapters/solo-farming-in-the-tower/cmrif7a0t00bn01pe7a07c1jl/78c3de9e-f56e-4dd8-af0e-9f5580d16023",
+          "https://poseidon-scans.net/api/chapters/solo-farming-in-the-tower/cmrif7a0t00bn01pe7a07c1jl/69b269d4-615f-4b95-9125-0e06769a281d",
+          "https://poseidon-scans.net/api/chapters/solo-farming-in-the-tower/cmrif7a0t00bn01pe7a07c1jl/45453029-b2ed-48f7-86ac-d28f7fb3ad16",
+          "https://poseidon-scans.net/api/chapters/solo-farming-in-the-tower/cmrif7a0t00bn01pe7a07c1jl/ff36d577-615f-4baf-8a95-282314db3e66",
+          "https://poseidon-scans.net/api/chapters/solo-farming-in-the-tower/cmrif7a0t00bn01pe7a07c1jl/195a7725-b153-45ff-9e2e-73d2e08aa2d6",
+          "https://poseidon-scans.net/api/chapters/solo-farming-in-the-tower/cmrif7a0t00bn01pe7a07c1jl/438b1ac6-b1e5-492f-b4c4-b7a2e5c4725f",
+          "https://poseidon-scans.net/api/chapters/solo-farming-in-the-tower/cmrif7a0t00bn01pe7a07c1jl/1e1ce228-7a56-4b59-b23e-e934e25eaa27",
+          "https://poseidon-scans.net/api/chapters/solo-farming-in-the-tower/cmrif7a0t00bn01pe7a07c1jl/e04c33bb-551f-4c49-b362-fd660d7c487b",
+          "https://poseidon-scans.net/api/chapters/solo-farming-in-the-tower/cmrif7a0t00bn01pe7a07c1jl/123ad048-484c-47bb-b31c-77e0e7ec26b6",
+          "https://poseidon-scans.net/api/chapters/solo-farming-in-the-tower/cmrif7a0t00bn01pe7a07c1jl/c5170b0a-0607-4c25-ab44-941a2ced8782",
+          "https://poseidon-scans.net/api/chapters/solo-farming-in-the-tower/cmrif7a0t00bn01pe7a07c1jl/94503d70-ea33-4d2b-9d62-0bb99078e4f6",
+          "https://poseidon-scans.net/api/chapters/solo-farming-in-the-tower/cmrif7a0t00bn01pe7a07c1jl/3f4cead6-cca5-4a98-8c94-981f1aa39eb2",
+          "https://poseidon-scans.net/api/chapters/solo-farming-in-the-tower/cmrif7a0t00bn01pe7a07c1jl/cb46cd90-5611-4781-a51a-dcda2556c09c",
+          "https://poseidon-scans.net/api/chapters/solo-farming-in-the-tower/cmrif7a0t00bn01pe7a07c1jl/f8fb23e1-9f26-47c0-8245-71f47247cb9b",
+          "https://poseidon-scans.net/api/chapters/solo-farming-in-the-tower/cmrif7a0t00bn01pe7a07c1jl/0a7bc16b-5317-44f8-be74-408aa2fa5b21",
+          "https://poseidon-scans.net/api/chapters/solo-farming-in-the-tower/cmrif7a0t00bn01pe7a07c1jl/ecfd06b3-c15e-47ae-b95f-fc51c1ba41f0"
+        ],
+        "_missing": {}
+      },
+      "error": null
+    },
+    "error": null
+  }
+}

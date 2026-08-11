@@ -216,6 +216,32 @@ Run optional live reader smoke tests against one public chapter from each source
 npm run test:live
 ```
 
+Generate and validate live `SourceInfo`, `MangaInfo`, `Chapter` and
+`ChapterDetails` metadata for one real manga and chapter from every source:
+
+```bash
+npm run test:metadata
+```
+
+Force the human Cloudflare flow, including from a Rider run console:
+
+```bash
+npm run metadata-interactif
+```
+
+This integration test uses each extension's public `getMangaDetails()`,
+`getChapters()` and `getChapterDetails()` methods. Cloudflare blocks and
+unavailable fields are recorded explicitly in the corresponding
+`metadata/*.json` file.
+
+When the command runs locally and detects Cloudflare, it opens the affected manga
+in the installed Chrome or Edge browser. Complete the challenge,
+return to the terminal and press Enter; the test retries through the validated
+browser session. This also works in Rider run consoles which do not expose a TTY.
+Enter `s` to skip a source. CI environments disable the prompt automatically. Set
+`PAPERBACK_CLOUDFLARE_INTERACTIVE=0` to disable it manually, `1` to force it, or
+`PAPERBACK_BROWSER_PATH` when Chrome/Edge is installed in a custom location.
+
 The live tests cover Omega Scans, MangaDistrict, Poseidon Scans and LelManga readers, plus catalogue probes for Epsilon Soft, Astral Manga and Mangas Origines. Cloudflare-protected probes are reported and skipped while a managed challenge is active. The live tests are intentionally not scheduled; GitHub Actions runs type checking and deterministic parser tests before building the repository.
 
 ## Build
@@ -258,6 +284,10 @@ The build creates `bundles/`, including:
 - `bundles/MangasOrigines/source.js`
 - `bundles/versioning.json`
 - `bundles/index.html`
+
+After each build, `scripts/generate-source-metadata.js` also creates one complete
+`SourceInfo` snapshot per source in `metadata/`. Optional values which are not
+configured are written as `null` and explained in the `_missing` object.
 
 ## Publish on GitHub Pages
 

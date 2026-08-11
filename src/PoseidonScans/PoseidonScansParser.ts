@@ -2,6 +2,7 @@ import { Chapter, ChapterDetails, MangaInfo, PagedResults, PartialSourceManga, T
 import { PoseidonJsonLd, PoseidonSearchFilters, PoseidonSearchParameters } from './models'
 import { createReaderError } from '../utils/readerError'
 import { normalizeHttpUrl } from '../utils/url'
+import { parseDateOrUndefined } from '../utils/date'
 
 const CATALOGUE_PAGE_SIZE = 20
 
@@ -128,8 +129,7 @@ export class PoseidonScansParser {
         chapNum,
         name: this.extractChapterName(current.id, block),
         langCode: 'fr',
-        group: 'Poseidon Scans',
-        time: new Date(),
+        group: this.sourceName,
         sortingIndex: chapNum
       }))
     }
@@ -296,6 +296,7 @@ export class PoseidonScansParser {
       seen[number] = true
       const chapNum = Number(number)
       const title = this.cleanText(match[3] ?? '')
+      const time = this.parseDate(createdAt)
 
       chapters.push(App.createChapter({
         id: number,
@@ -303,7 +304,7 @@ export class PoseidonScansParser {
         name: title.length > 0 ? `Chapitre ${number} - ${title}` : `Chapitre ${number}`,
         langCode: 'fr',
         group: this.sourceName,
-        time: this.parseDate(createdAt),
+        ...(time ? { time } : {}),
         sortingIndex: chapNum
       }))
     }
@@ -443,7 +444,8 @@ export class PoseidonScansParser {
 
   private seriesAdditionalInfo(html: string): Record<string, string> {
     const info: Record<string, string> = {}
-    const type = this.extractSerializedString(html, 'type')
+    const type = this.extractSerializedStrings(html, 'type')
+      .find(value => /^(?:MANGA|MANHWA|MANHUA|COMIC)$/i.test(value))
     const releaseYear = this.extractSerializedNumber(html, 'releaseYear')
     const views = this.extractSerializedNumber(html, 'viewCount')
     const favorites = /"favorites":(\d+)/.exec(this.searchableHtml(html))?.[1]
@@ -457,9 +459,22 @@ export class PoseidonScansParser {
   }
 
   private extractSerializedString(html: string, field: string): string {
+    return this.extractSerializedStrings(html, field)[0] ?? ''
+  }
+
+  private extractSerializedStrings(html: string, field: string): string[] {
     const escaped = this.escapeRegExp(field)
-    const value = new RegExp(`"${escaped}":(?:null|"((?:\\\\.|[^"])*)")`).exec(this.searchableHtml(html))?.[1]
-    return this.cleanText(value ?? '')
+    const pattern = new RegExp(`"${escaped}":(?:null|"((?:\\\\.|[^"])*)")`, 'g')
+    const text = this.searchableHtml(html)
+    const values: string[] = []
+    let match: RegExpExecArray | null
+
+    while ((match = pattern.exec(text)) !== null) {
+      const value = this.cleanText(match[1] ?? '')
+      if (value) values.push(value)
+    }
+
+    return values
   }
 
   private extractSerializedNumber(html: string, field: string): string {
@@ -474,13 +489,8 @@ export class PoseidonScansParser {
       .filter(title => title.length > 0)
   }
 
-  private parseDate(value: string | undefined): Date {
-    if (!value) {
-      return new Date()
-    }
-
-    const parsed = new Date(value)
-    return Number.isNaN(parsed.getTime()) ? new Date() : parsed
+  private parseDate(value: string | undefined): Date | undefined {
+    return parseDateOrUndefined(value)
   }
 
   private toTagSection(labels: string[]): TagSection {

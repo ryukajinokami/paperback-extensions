@@ -2,6 +2,7 @@ import { Chapter, ChapterDetails, MangaInfo, PagedResults, PartialSourceManga, T
 import { MangaDistrictGenre } from './models'
 import { createReaderError } from '../utils/readerError'
 import { normalizeHttpUrl } from '../utils/url'
+import { parseDateOrUndefined, parseFrenchDateOrUndefined } from '../utils/date'
 
 const CARD_PAGE_SIZE = 30
 
@@ -13,6 +14,10 @@ export interface MadaraParserOptions {
   langCode?: string
   hentai?: boolean
   acceptWordPressReaderImages?: boolean
+  modernChapterContainerClass?: string
+  modernChapterDateClass?: string
+  modernAuthorLabel?: string
+  modernArtistLabel?: string
 }
 
 export class MangaDistrictParser {
@@ -26,7 +31,11 @@ export class MangaDistrictParser {
       sourceName: options.sourceName ?? 'MangaDistrict',
       langCode: options.langCode ?? 'en',
       hentai: options.hentai ?? true,
-      acceptWordPressReaderImages: options.acceptWordPressReaderImages ?? false
+      acceptWordPressReaderImages: options.acceptWordPressReaderImages ?? false,
+      modernChapterContainerClass: options.modernChapterContainerClass ?? '',
+      modernChapterDateClass: options.modernChapterDateClass ?? '',
+      modernAuthorLabel: options.modernAuthorLabel ?? '',
+      modernArtistLabel: options.modernArtistLabel ?? ''
     }
   }
 
@@ -49,8 +58,13 @@ export class MangaDistrictParser {
     return App.createMangaInfo({
       image: cover,
       titles: Array.from(new Set([title, ...alternativeTitles])),
-      author: this.extractNamedContent(html, 'author-content') || this.extractModernAuthor(html) || 'Unknown',
-      artist: this.extractNamedContent(html, 'artist-content') || 'Unknown',
+      author: this.extractNamedContent(html, 'author-content')
+        || this.extractConfiguredModernInfo(html, this.options.modernAuthorLabel)
+        || this.extractModernAuthor(html)
+        || 'Unknown',
+      artist: this.extractNamedContent(html, 'artist-content')
+        || this.extractConfiguredModernInfo(html, this.options.modernArtistLabel)
+        || 'Unknown',
       desc: this.extractDescription(html),
       status,
       hentai: this.options.hentai,
@@ -79,6 +93,7 @@ export class MangaDistrictParser {
       seen[chapterId] = true
       const name = this.cleanText(this.extractAnchorText(block) || this.titleFromSlug(chapterId))
       const chapNum = this.chapterNumber(chapterId, name)
+      const time = this.parseChapterDate(block)
 
       chapters.push(App.createChapter({
         id: chapterId,
@@ -86,7 +101,7 @@ export class MangaDistrictParser {
         name,
         langCode: this.options.langCode,
         group: this.options.sourceName,
-        time: this.parseChapterDate(block),
+        ...(time ? { time } : {}),
         sortingIndex: chapNum
       }))
     }
@@ -106,6 +121,7 @@ export class MangaDistrictParser {
         ? `${this.options.langCode === 'fr' ? 'Chapitre' : 'Chapter'} ${rawName}`
         : rawName
       const chapNum = this.chapterNumber(chapterId, name)
+      const time = this.parseModernChapterDate(html, match.index)
 
       chapters.push(App.createChapter({
         id: chapterId,
@@ -113,7 +129,7 @@ export class MangaDistrictParser {
         name,
         langCode: this.options.langCode,
         group: this.options.sourceName,
-        time: new Date(),
+        ...(time ? { time } : {}),
         sortingIndex: chapNum
       }))
     }
@@ -144,7 +160,6 @@ export class MangaDistrictParser {
         name: `${this.options.langCode === 'fr' ? 'Chapitre' : 'Chapter'} ${chapterNumber}`,
         langCode: this.options.langCode,
         group: this.options.sourceName,
-        time: new Date(),
         sortingIndex: chapterNumber
       }))
     }
@@ -444,9 +459,29 @@ export class MangaDistrictParser {
   }
 
   private extractModernInfo(html: string, label: string): string {
-    const escaped = this.escapeRegExp(label)
-    const match = new RegExp(`<dt>\\s*${escaped}\\s*<\\/dt>\\s*<dd>([\\s\\S]*?)<\\/dd>`, 'i').exec(html)
-    return this.cleanHtml(match?.[1] ?? '')
+    const expectedLabel = this.normalizeInfoLabel(label)
+    const pattern = /<dt\b[^>]*>([\s\S]*?)<\/dt>\s*<dd\b[^>]*>([\s\S]*?)<\/dd>/gi
+    let match: RegExpExecArray | null
+
+    while ((match = pattern.exec(html)) !== null) {
+      if (this.normalizeInfoLabel(match[1] ?? '') === expectedLabel) {
+        return this.cleanHtml(match[2] ?? '')
+      }
+    }
+
+    return ''
+  }
+
+  private extractConfiguredModernInfo(html: string, label: string): string {
+    return label.length > 0 ? this.extractModernInfo(html, label) : ''
+  }
+
+  private normalizeInfoLabel(value: string): string {
+    return this.cleanHtml(value)
+      .replace(/&eacute;/gi, 'e')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
   }
 
   private seriesAdditionalInfo(html: string): Record<string, string> {
@@ -568,11 +603,44 @@ export class MangaDistrictParser {
     return Number(`${parts[0]}.${parts.slice(1).join('')}`)
   }
 
-  private parseChapterDate(block: string): Date {
+  private parseChapterDate(block: string): Date | undefined {
     const dateText = /<span[^>]+class=["'][^"']*timediff[^"']*["'][^>]*>[\s\S]*?<i[^>]*>([\s\S]*?)<\/i>/i.exec(block)?.[1] ?? ''
-    const parsed = new Date(this.cleanHtml(dateText))
+    return parseDateOrUndefined(this.cleanHtml(dateText))
+  }
 
-    return Number.isNaN(parsed.getTime()) ? new Date() : parsed
+  private parseModernChapterDate(html: string, chapterIndex: number): Date | undefined {
+    const containerClass = this.options.modernChapterContainerClass
+    const dateClass = this.options.modernChapterDateClass
+    if (!containerClass || !dateClass) {
+      return undefined
+    }
+
+    const containerPattern = new RegExp(`<[^>]+class=["'][^"']*\\b${this.escapeRegExp(containerClass)}\\b[^"']*["'][^>]*>`, 'gi')
+    let container: RegExpExecArray | null
+    let start = -1
+    let end = html.length
+
+    while ((container = containerPattern.exec(html)) !== null) {
+      if (container.index > chapterIndex) {
+        end = container.index
+        break
+      }
+      start = container.index
+    }
+
+    if (start < 0) {
+      return undefined
+    }
+
+    const block = html.slice(start, end)
+    const datePattern = new RegExp(`<[^>]+class=["'][^"']*\\b${this.escapeRegExp(dateClass)}\\b[^"']*["'][^>]*>[\\s\\S]*?<\\/[^>]+>`, 'i')
+    const dateElement = datePattern.exec(block)?.[0]
+    if (!dateElement) {
+      return undefined
+    }
+
+    const dateValue = this.extractAttribute(dateElement, 'datetime') || this.cleanHtml(dateElement)
+    return parseFrenchDateOrUndefined(dateValue)
   }
 
   private hasNextPage(html: string, resultCount: number, page: number): boolean {

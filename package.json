@@ -8,10 +8,14 @@
     "generate-version": "node scripts/generate-version.js",
     "test": "tsx --test tests/parsers.test.ts",
     "test:live": "tsx scripts/smoke-tests.ts",
+    "pretest:metadata": "npm run generate-version",
+    "test:metadata": "tsx --test tests/metadata.live.test.ts",
+    "metadata-interactif": "node scripts/run-metadata-interactive.js",
     "pretypecheck": "npm run generate-version",
     "typecheck": "tsc --noEmit",
     "prebuild": "npm run generate-version",
     "build": "paperback bundle",
+    "postbuild": "node scripts/generate-source-metadata.js",
     "prebundle": "npm run generate-version",
     "bundle": "paperback bundle",
     "preserve": "npm run generate-version",
@@ -33,6 +37,7 @@
     "@paperback/toolchain": "0.8.0-alpha.38",
     "@paperback/types": "0.8.0-alpha.38",
     "@types/node": "^18.11.9",
+    "playwright-core": "^1.62.1",
     "tsx": "^4.23.12",
     "typescript": "^4.8.3"
   }

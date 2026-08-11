@@ -1,0 +1,205 @@
+{
+  "id": "MangaDistrict",
+  "version": "2026.8.11.19",
+  "name": "MangaDistrict",
+  "icon": "icon.png",
+  "author": "Paperback Community",
+  "description": "MangaDistrict source for Paperback v0.8. Supports search, details, chapters and reader pages.",
+  "contentRating": "ADULT",
+  "websiteBaseURL": "https://mangadistrict.com",
+  "authorWebsite": null,
+  "language": "English",
+  "sourceTags": [
+    {
+      "text": "English",
+      "type": "default"
+    },
+    {
+      "text": "Adult",
+      "type": "info"
+    },
+    {
+      "text": "Madara",
+      "type": "success"
+    }
+  ],
+  "intents": 5,
+  "intentNames": [
+    "MANGA_CHAPTERS",
+    "HOMEPAGE_SECTIONS"
+  ],
+  "_missing": {
+    "authorWebsite": "NOT_FOUND: optional Paperback metadata is not configured."
+  },
+  "_contract": "@paperback/types SourceInfo, MangaInfo, Chapter and ChapterDetails 0.8.0-alpha.38",
+  "manga": {
+    "fetchStatus": "FOUND",
+    "mangaId": "crime-and-punishment-daktaryeong-uncensored",
+    "shareUrl": "https://mangadistrict.com/series/crime-and-punishment-daktaryeong-uncensored/",
+    "fetchedAt": "2026-08-11T12:05:05.475Z",
+    "metadata": {
+      "image": "https://cdn.mangadistrict.com/thumbnail/crime-and-punishment-daktaryeong-uncensored.webp",
+      "artist": "Team Oldrock",
+      "author": "Daktaryeong",
+      "desc": "Crime and Punishment (Daktaryeong) (Uncensored)\n Nisha is shocked when she meets her mother's new boyfriend Perry, who's come to punish Nisha for what she did to him in the past.",
+      "status": "OnGoing",
+      "hentai": true,
+      "titles": [
+        "[MOTION] Crime and Punishment (Daktaryeong) (Uncensored)",
+        "Crime and Punishment (Team Oldrock)",
+        "Crime e Castigo (Team Oldrock)",
+        "Crimen y castigo (Team Oldrock)",
+        "Crimes et Châtiments",
+        "Delitto e Castigo (Team Oldrock)",
+        "Suç Ve Ceza",
+        "Zuckerbrot und Peitsche",
+        "罪と罰～すべては合意の上～",
+        "죄와 벌",
+        "죄와벌",
+        "죄와벌 (Team. 올드락)",
+        "Joewabeol",
+        "罪與罰"
+      ],
+      "banner": null,
+      "rating": 3,
+      "tags": [
+        {
+          "id": "genres",
+          "label": "Genres",
+          "tags": [
+            {
+              "id": "borderline-h",
+              "label": "Borderline H"
+            },
+            {
+              "id": "drama",
+              "label": "Drama"
+            },
+            {
+              "id": "explicit-sex",
+              "label": "Explicit Sex"
+            },
+            {
+              "id": "full-color",
+              "label": "Full Color"
+            },
+            {
+              "id": "manhwa",
+              "label": "Manhwa"
+            },
+            {
+              "id": "motion",
+              "label": "Motion"
+            },
+            {
+              "id": "mystery",
+              "label": "Mystery"
+            },
+            {
+              "id": "romance",
+              "label": "Romance"
+            },
+            {
+              "id": "sexual-abuse",
+              "label": "Sexual Abuse"
+            },
+            {
+              "id": "uncensored",
+              "label": "Uncensored"
+            },
+            {
+              "id": "violence",
+              "label": "Violence"
+            },
+            {
+              "id": "webtoons",
+              "label": "Webtoons"
+            },
+            {
+              "id": "work-life",
+              "label": "Work Life"
+            }
+          ]
+        }
+      ],
+      "covers": [
+        "https://cdn.mangadistrict.com/thumbnail/crime-and-punishment-daktaryeong-uncensored.webp"
+      ],
+      "additionalInfo": {
+        "Type": "Manhwa, Webtoons",
+        "Release": "2018",
+        "Status": "OnGoing"
+      },
+      "avgRating": null,
+      "follows": null,
+      "langFlag": null,
+      "langName": null,
+      "users": null,
+      "views": null,
+      "_missing": {
+        "banner": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "avgRating": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "follows": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "langFlag": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "langName": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "users": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source.",
+        "views": "NOT_FOUND: optional MangaInfo metadata is not exposed by the source."
+      }
+    },
+    "error": null
+  },
+  "chapter": {
+    "fetchStatus": "FOUND",
+    "mangaId": "crime-and-punishment-daktaryeong-uncensored",
+    "chapterCount": 10,
+    "fetchedAt": "2026-08-11T12:05:05.746Z",
+    "metadata": {
+      "id": "chapter-10",
+      "chapNum": 10,
+      "langCode": "en",
+      "name": "Chapter 10",
+      "volume": null,
+      "group": "MangaDistrict",
+      "time": null,
+      "sortingIndex": 10,
+      "_missing": {
+        "volume": "NOT_FOUND: required Chapter metadata was not returned by the source.",
+        "time": "NOT_FOUND: required Chapter metadata was not returned by the source."
+      }
+    },
+    "details": {
+      "fetchStatus": "FOUND",
+      "fetchedAt": "2026-08-11T12:05:05.746Z",
+      "metadata": {
+        "id": "chapter-10",
+        "mangaId": "crime-and-punishment-daktaryeong-uncensored",
+        "pages": [
+          "https://cdn.mangadistrict.com/publication/manga_6a795022ba3e3/chapter-10/001.jpg",
+          "https://cdn.mangadistrict.com/publication/manga_6a795022ba3e3/chapter-10/03.jpg",
+          "https://cdn.mangadistrict.com/publication/manga_6a795022ba3e3/chapter-10/04.jpg",
+          "https://cdn.mangadistrict.com/publication/manga_6a795022ba3e3/chapter-10/05.jpg",
+          "https://cdn.mangadistrict.com/publication/manga_6a795022ba3e3/chapter-10/06.jpg",
+          "https://cdn.mangadistrict.com/publication/manga_6a795022ba3e3/chapter-10/07.jpg",
+          "https://cdn.mangadistrict.com/publication/manga_6a795022ba3e3/chapter-10/08.jpg",
+          "https://cdn.mangadistrict.com/publication/manga_6a795022ba3e3/chapter-10/10.jpg",
+          "https://cdn.mangadistrict.com/publication/manga_6a795022ba3e3/chapter-10/11.jpg",
+          "https://cdn.mangadistrict.com/publication/manga_6a795022ba3e3/chapter-10/12.jpg",
+          "https://cdn.mangadistrict.com/publication/manga_6a795022ba3e3/chapter-10/13.jpg",
+          "https://cdn.mangadistrict.com/publication/manga_6a795022ba3e3/chapter-10/14.jpg",
+          "https://cdn.mangadistrict.com/publication/manga_6a795022ba3e3/chapter-10/16.jpg",
+          "https://cdn.mangadistrict.com/publication/manga_6a795022ba3e3/chapter-10/17.jpg",
+          "https://cdn.mangadistrict.com/publication/manga_6a795022ba3e3/chapter-10/18.jpg",
+          "https://cdn.mangadistrict.com/publication/manga_6a795022ba3e3/chapter-10/20.jpg",
+          "https://cdn.mangadistrict.com/publication/manga_6a795022ba3e3/chapter-10/21.jpg",
+          "https://cdn.mangadistrict.com/publication/manga_6a795022ba3e3/chapter-10/22.jpg",
+          "https://cdn.mangadistrict.com/publication/manga_6a795022ba3e3/chapter-10/23.jpg",
+          "https://cdn.mangadistrict.com/publication/manga_6a795022ba3e3/chapter-10/24.jpg",
+          "https://cdn.mangadistrict.com/publication/manga_6a795022ba3e3/chapter-10/26.jpg"
+        ],
+        "_missing": {}
+      },
+      "error": null
+    },
+    "error": null
+  }
+}

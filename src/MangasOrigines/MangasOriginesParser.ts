@@ -9,7 +9,11 @@ export class MangasOriginesParser extends MangaDistrictParser {
       sourceName: 'Mangas Origines',
       langCode: 'fr',
       hentai: false,
-      acceptWordPressReaderImages: true
+      acceptWordPressReaderImages: true,
+      modernChapterContainerClass: 'ori-chl-row',
+      modernChapterDateClass: 'ori-chl-date',
+      modernAuthorLabel: 'Scénario',
+      modernArtistLabel: 'Dessin'
     })
   }
 }

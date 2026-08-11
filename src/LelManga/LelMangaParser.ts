@@ -1,6 +1,7 @@
 import { Chapter, ChapterDetails, MangaInfo, PagedResults, PartialSourceManga, Tag, TagSection } from '@paperback/types'
 import { createReaderError } from '../utils/readerError'
 import { normalizeHttpUrl } from '../utils/url'
+import { parseDateOrUndefined } from '../utils/date'
 import { LelMangaSearchParameters } from './models'
 
 export class LelMangaParser {
@@ -101,13 +102,14 @@ export class LelMangaParser {
 
     while ((match = pattern.exec(list)) !== null) {
       const chapNum = this.chapterNumber(match[1] ?? '')
+      const time = this.parseDate(this.cleanHtml(match[4] ?? ''))
       chapters.push(App.createChapter({
         id: this.decodeText(match[2] ?? ''),
         chapNum,
         name: this.cleanHtml(match[3] ?? '') || `Chapitre ${match[1]}`,
         langCode: 'fr',
         group: 'LelManga',
-        time: this.parseDate(this.cleanHtml(match[4] ?? '')),
+        ...(time ? { time } : {}),
         sortingIndex: chapNum
       }))
     }
@@ -182,9 +184,8 @@ export class LelMangaParser {
     return Number.isFinite(number) ? number : 0
   }
 
-  private parseDate(value: string): Date {
-    const date = new Date(value)
-    return Number.isNaN(date.getTime()) ? new Date() : date
+  private parseDate(value: string): Date | undefined {
+    return parseDateOrUndefined(value)
   }
 
   private cleanHtml(value: string): string {
