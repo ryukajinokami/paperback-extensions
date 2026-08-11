@@ -38,6 +38,9 @@ interface CatalogueResponse {
   }
 }
 
+type FormValue = string | number | boolean
+type FormFields = Record<string, FormValue>
+
 export const MangasOriginesInfo: SourceInfo = {
   name: 'Mangas Origines',
   author: 'Paperback Community',
@@ -130,7 +133,7 @@ export class MangasOrigines implements Searchable, MangaProviding, ChapterProvid
         'x-requested-with': 'XMLHttpRequest',
         'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
         referer: this.parser.buildSeriesUrl(mangaId)
-      }, { paperback: 1 })
+      }, this.formEncode({ paperback: 1 }))
 
       const chapters = this.parser.parseChapters(mangaId, html)
       if (chapters.length > 0) {
@@ -240,7 +243,7 @@ export class MangasOrigines implements Searchable, MangaProviding, ChapterProvid
       'x-requested-with': 'XMLHttpRequest',
       'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
       referer: `${BASE_URL}/catalogues/`
-    }, {
+    }, this.formEncode({
       action: 'madara_child_catalogue',
       s: title,
       genres: includedTagIds.join(','),
@@ -254,7 +257,7 @@ export class MangasOrigines implements Searchable, MangaProviding, ChapterProvid
       auteur: '',
       artiste: '',
       annee: ''
-    })
+    }))
 
     let payload: CatalogueResponse
     try {
@@ -353,6 +356,16 @@ export class MangasOrigines implements Searchable, MangaProviding, ChapterProvid
     }
 
     return response.data
+  }
+
+  private formEncode(data: FormFields): string {
+    return Object.keys(data)
+      .map(key => `${this.formComponent(key)}=${this.formComponent(String(data[key]))}`)
+      .join('&')
+  }
+
+  private formComponent(value: string): string {
+    return encodeURIComponent(value).replace(/%20/g, '+')
   }
 
   private async headers(url: string): Promise<Request['headers']> {

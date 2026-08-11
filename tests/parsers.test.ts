@@ -249,7 +249,7 @@ test('Mangas Origines supports its customized Madara routes and WordPress reader
 
 test('Mangas Origines sends catalogue filters through the marked AJAX endpoint', async () => {
   const source = new MangasOrigines()
-  const requests: Array<{ url: string, method: string, data: Record<string, unknown> }> = []
+  const requests: Array<{ url: string, method: string, data: unknown }> = []
   const html = '<a class="ori-card ori-cat-card" href="https://mangas-origines.fr/oeuvre/volcanic-age/"><img src="/cover.webp" alt="Volcanic Age"><span class="ori-card-title">Volcanic Age</span></a>'
 
   ;(source.requestManager as unknown as { schedule: (request: typeof requests[number]) => Promise<unknown> }).schedule = async request => {
@@ -267,10 +267,12 @@ test('Mangas Origines sends catalogue filters through the marked AJAX endpoint',
   assert.equal(results.results[0]?.mangaId, 'volcanic-age')
   assert.equal(requests[0]?.url, 'https://mangas-origines.fr/wp-admin/admin-ajax.php?paperback=1')
   assert.equal(requests[0]?.method, 'POST')
-  assert.equal(requests[0]?.data.action, 'madara_child_catalogue')
-  assert.equal(requests[0]?.data.s, 'volcanic')
-  assert.equal(requests[0]?.data.genres, 'action')
-  assert.equal(requests[0]?.data.tri, 'notes')
+  assert.equal(typeof requests[0]?.data, 'string')
+  const body = new URLSearchParams(String(requests[0]?.data))
+  assert.equal(body.get('action'), 'madara_child_catalogue')
+  assert.equal(body.get('s'), 'volcanic')
+  assert.equal(body.get('genres'), 'action')
+  assert.equal(body.get('tri'), 'notes')
 })
 
 test('Astral Manga parses UUID routes and selects the chapter image directory', () => {
