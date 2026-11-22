@@ -44,6 +44,12 @@
       "name": "Mangas Origines - 2026",
       "version": "1.0.0",
       "url": "https://<your-github-username>.github.io/<your-repository-name>/MangasOrigines2026/index.js"
+    },
+    {
+      "id": "HentaiScantrad",
+      "name": "Hentai-Scantrad",
+      "version": "1.0.0",
+      "url": "https://<your-github-username>.github.io/<your-repository-name>/HentaiScantrad/index.js"
     }
   ]
 }

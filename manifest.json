@@ -58,6 +58,14 @@
       "websiteBaseURL": "https://mangas-origines.fr",
       "contentRating": "ADULT",
       "path": "bundles/MangasOrigines2026/index.js"
+    },
+    {
+      "id": "HentaiScantrad",
+      "name": "Hentai-Scantrad",
+      "version": "1.0.0",
+      "websiteBaseURL": "https://hentai-scantrad.org",
+      "contentRating": "ADULT",
+      "path": "bundles/HentaiScantrad/index.js"
     }
   ]
 }

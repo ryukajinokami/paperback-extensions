@@ -1,0 +1,124 @@
+{
+  "id": "HentaiScantrad",
+  "version": "2026.11.22.22",
+  "name": "Hentai-Scantrad",
+  "icon": "icon.png",
+  "author": "Paperback Community",
+  "description": "Source française Hentai-Scantrad pour Paperback v0.8 : catalogue, fiches et chapitres publics.",
+  "contentRating": "ADULT",
+  "websiteBaseURL": "https://hentai-scantrad.org",
+  "authorWebsite": null,
+  "language": "French",
+  "sourceTags": [
+    {
+      "text": "French",
+      "type": "default"
+    },
+    {
+      "text": "Adult",
+      "type": "info"
+    },
+    {
+      "text": "Madara",
+      "type": "success"
+    }
+  ],
+  "intents": 5,
+  "intentNames": [
+    "MANGA_CHAPTERS",
+    "HOMEPAGE_SECTIONS"
+  ],
+  "_missing": {
+    "authorWebsite": "NOT_FOUND: optional Paperback metadata is not configured."
+  },
+  "_contract": "@paperback/types SourceInfo, MangaInfo, Chapter and ChapterDetails 0.8.0-alpha.38",
+  "manga": {
+    "fetchStatus": "NOT_TESTED",
+    "mangaId": null,
+    "shareUrl": null,
+    "fetchedAt": null,
+    "metadata": {
+      "image": null,
+      "artist": null,
+      "author": null,
+      "desc": null,
+      "status": null,
+      "hentai": null,
+      "titles": null,
+      "banner": null,
+      "rating": null,
+      "tags": null,
+      "covers": null,
+      "additionalInfo": null,
+      "avgRating": null,
+      "follows": null,
+      "langFlag": null,
+      "langName": null,
+      "users": null,
+      "views": null,
+      "_missing": {
+        "image": "NOT_FOUND: live metadata test has not been run.",
+        "artist": "NOT_FOUND: live metadata test has not been run.",
+        "author": "NOT_FOUND: live metadata test has not been run.",
+        "desc": "NOT_FOUND: live metadata test has not been run.",
+        "status": "NOT_FOUND: live metadata test has not been run.",
+        "hentai": "NOT_FOUND: live metadata test has not been run.",
+        "titles": "NOT_FOUND: live metadata test has not been run.",
+        "banner": "NOT_FOUND: live metadata test has not been run.",
+        "rating": "NOT_FOUND: live metadata test has not been run.",
+        "tags": "NOT_FOUND: live metadata test has not been run.",
+        "covers": "NOT_FOUND: live metadata test has not been run.",
+        "additionalInfo": "NOT_FOUND: live metadata test has not been run.",
+        "avgRating": "NOT_FOUND: live metadata test has not been run.",
+        "follows": "NOT_FOUND: live metadata test has not been run.",
+        "langFlag": "NOT_FOUND: live metadata test has not been run.",
+        "langName": "NOT_FOUND: live metadata test has not been run.",
+        "users": "NOT_FOUND: live metadata test has not been run.",
+        "views": "NOT_FOUND: live metadata test has not been run."
+      }
+    },
+    "error": "Run npm run test:metadata to fetch a real manga."
+  },
+  "chapter": {
+    "fetchStatus": "NOT_TESTED",
+    "mangaId": null,
+    "chapterCount": null,
+    "fetchedAt": null,
+    "metadata": {
+      "id": null,
+      "chapNum": null,
+      "langCode": null,
+      "name": null,
+      "volume": null,
+      "group": null,
+      "time": null,
+      "sortingIndex": null,
+      "_missing": {
+        "id": "NOT_FOUND: live chapter test has not been run.",
+        "chapNum": "NOT_FOUND: live chapter test has not been run.",
+        "langCode": "NOT_FOUND: live chapter test has not been run.",
+        "name": "NOT_FOUND: live chapter test has not been run.",
+        "volume": "NOT_FOUND: live chapter test has not been run.",
+        "group": "NOT_FOUND: live chapter test has not been run.",
+        "time": "NOT_FOUND: live chapter test has not been run.",
+        "sortingIndex": "NOT_FOUND: live chapter test has not been run."
+      }
+    },
+    "details": {
+      "fetchStatus": "NOT_TESTED",
+      "fetchedAt": null,
+      "metadata": {
+        "id": null,
+        "mangaId": null,
+        "pages": null,
+        "_missing": {
+          "id": "NOT_FOUND: live chapter details test has not been run.",
+          "mangaId": "NOT_FOUND: live chapter details test has not been run.",
+          "pages": "NOT_FOUND: live chapter details test has not been run."
+        }
+      },
+      "error": "Run npm run test:metadata to fetch a real chapter."
+    },
+    "error": "Run npm run test:metadata to fetch a real chapter."
+  }
+}

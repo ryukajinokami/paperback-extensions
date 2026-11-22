@@ -6,6 +6,8 @@ This repository targets `@paperback/types` and `@paperback/toolchain` `0.8.0-alp
 
 ## Sources
 
+- Hentai-Scantrad: https://hentai-scantrad.org (ADULT)
+
 - Omega Scans: https://omegascans.org
 - MangaDistrict: https://mangadistrict.com
 - Poseidon Scans: https://poseidon-scans.net
@@ -322,3 +324,7 @@ If you deploy the contents of `bundles/` under a subfolder, use that subfolder U
 ## License
 
 This project is licensed under the MIT License. See [LICENSE](./LICENSE).
+
+## Hentai-Scantrad
+
+French adult Madara source with catalogue search, genre filters, ordering, series metadata, public AJAX chapter lists and reader images from the site storage host. Login and account-only chapters are not supported.

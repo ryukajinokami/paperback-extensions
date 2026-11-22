@@ -363,3 +363,23 @@ test('Astral Manga parses UUID routes and selects the chapter image directory', 
   assert.throws(() => parser.parseChapterDetails(mangaId, chapterId, '<script src="/_next/static/chunks/app.js"></script>'))
   assert.equal(parser.buildCatalogueUrl(1, '', [{ id: 'Action', label: 'Action' }]), 'https://astral-manga.fr/catalog?tags=Action')
 })
+
+
+test('Hentai-Scantrad accepts its storage pages and preserves decimal French chapter numbers', () => {
+  const parser = new MangaDistrictParser('https://hentai-scantrad.org', {
+    seriesPath: 'manga', sourceName: 'Hentai-Scantrad', langCode: 'fr',
+    readerImageOrigins: ['https://stockage.hentai-scantrad.org']
+  })
+  const chapters = parser.parseChapters('example', '<li class="wp-manga-chapter"><a href="https://hentai-scantrad.org/manga/example/bonus/">Chapitre 12,5</a></li>')
+  assert.equal(chapters[0]?.chapNum, 12.5)
+  assert.equal(chapters[0]?.langCode, 'fr')
+  const html = '<div class="reading-content">' + [
+    'https://stockage.hentai-scantrad.org/manga_example/chapter/1.webp',
+    'https://stockage.hentai-scantrad.org.evil.example/manga_example/2.webp',
+    'https://unrelated.example/manga_example/3.webp'
+  ].map(url => `<img class="wp-manga-chapter-img" data-src=" ${url} ">`).join('') + '</div>'
+  assert.deepEqual(parser.parseChapterDetails('example', 'bonus', html).pages, [
+    'https://stockage.hentai-scantrad.org/manga_example/chapter/1.webp'
+  ])
+  assert.throws(() => new MangaDistrictParser('https://mangadistrict.com').parseChapterDetails('example', 'bonus', html))
+})

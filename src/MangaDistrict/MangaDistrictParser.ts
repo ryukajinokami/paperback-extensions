@@ -7,6 +7,7 @@ import { parseDateOrUndefined, parseFrenchDateOrUndefined } from '../utils/date'
 const CARD_PAGE_SIZE = 30
 
 export interface MadaraParserOptions {
+  readerImageOrigins?: string[]
   archivePath?: string
   seriesPath?: string
   genrePath?: string
@@ -25,6 +26,7 @@ export class MangaDistrictParser {
 
   constructor(private readonly baseUrl: string, options: MadaraParserOptions = {}) {
     this.options = {
+      readerImageOrigins: options.readerImageOrigins ?? [],
       archivePath: options.archivePath ?? 'series',
       seriesPath: options.seriesPath ?? 'series',
       genrePath: options.genrePath ?? 'publication-genre',
@@ -201,6 +203,13 @@ export class MangaDistrictParser {
       }
     }
 
+    const checkboxPattern = /<input[^>]+value=["']([^"']+)["'][^>]+name=["']genre\[\]["'][^>]*>\s*<label[^>]*>([\s\S]*?)<\/label>/gi
+    while ((match = checkboxPattern.exec(html)) !== null) {
+      const id = this.cleanText(match[1] ?? '')
+      const label = this.cleanHtml(match[2] ?? '')
+      if (id && label) seen[id] = { id, label }
+    }
+
     const modernTagPattern = /<label[^>]+class=["'][^"']*ori-fcheck[^"']*["'][^>]*>[\s\S]*?<input[^>]+value=["']([^"']+)["'][^>]*>[\s\S]*?<span[^>]+class=["'][^"']*ori-flabel[^"']*["'][^>]*>([\s\S]*?)<\/span>[\s\S]*?<\/label>/gi
     while ((match = modernTagPattern.exec(html)) !== null) {
       const id = this.cleanText(match[1] ?? '')
@@ -278,9 +287,10 @@ export class MangaDistrictParser {
   }
 
   private parseMangaCards(html: string): PartialSourceManga[] {
-    const legacyBlocks = html.split(/<div[^>]+class=["'][^"']*page-item-detail[^"']*manga[^"']*["'][^>]*>/i).slice(1)
+    const legacyBlocks = html.split(/<div[^>]+class=["'][^"']*page-item-detail[^"']*["'][^>]*>/i).slice(1)
     const modernBlocks = html.match(/<a[^>]+class=["'][^"']*ori-cat-card[^"']*["'][^>]*>[\s\S]*?<\/a>/gi) ?? []
-    const blocks = [...legacyBlocks, ...modernBlocks]
+    const searchBlocks = html.split(/<div[^>]+class=["'][^"']*c-tabs-item__content[^"']*["'][^>]*>/i).slice(1)
+    const blocks = [...legacyBlocks, ...modernBlocks, ...searchBlocks]
     const seen: Record<string, boolean> = {}
     const results: PartialSourceManga[] = []
 
@@ -567,6 +577,7 @@ export class MangaDistrictParser {
       return false
     }
 
+    if (this.options.readerImageOrigins.some(origin => lower.startsWith(`${origin.toLowerCase()}/manga_`))) return true
     if (this.options.acceptWordPressReaderImages) return lower.includes('/wp-content/uploads/')
     if (lower.includes('/assets/publication/media/') || lower.includes('/wp-content/')) return false
 
@@ -585,9 +596,9 @@ export class MangaDistrictParser {
   }
 
   private chapterNumber(chapterId: string, title: string): number {
-    const titleMatch = /chapter\s+(\d+(?:\.\d+)?)/i.exec(title)
+    const titleMatch = /chap(?:ter|itre)\s+(\d+(?:[.,]\d+)?)/i.exec(title)
     if (titleMatch?.[1]) {
-      return Number(titleMatch[1])
+      return Number(titleMatch[1].replace(',', '.'))
     }
 
     const slugMatch = /chap(?:ter|itre)-(\d+(?:-\d+)?)/i.exec(chapterId)

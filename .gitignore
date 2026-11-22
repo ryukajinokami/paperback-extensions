@@ -13,3 +13,5 @@ src/MangasOrigines2026/version.ts
 PaperBack.sln
 *.tgz
 .DS_Store
+
+src/HentaiScantrad/version.ts
