@@ -6,6 +6,8 @@ This repository targets `@paperback/types` and `@paperback/toolchain` `0.8.0-alp
 
 ## Sources
 
+- Hentai Origines: https://hentai-origines.com (ADULT)
+
 - Hentai-Scantrad: https://hentai-scantrad.org (ADULT)
 
 - Omega Scans: https://omegascans.org
@@ -328,3 +330,7 @@ This project is licensed under the MIT License. See [LICENSE](./LICENSE).
 ## Hentai-Scantrad
 
 French adult Madara source with catalogue search, genre filters, ordering, series metadata, public AJAX chapter lists and reader images from the site storage host. Login and account-only chapters are not supported.
+
+## Hentai Origines
+
+French adult source with AJAX catalogue search and filters, metadata, public chapter lists and direct WordPress reader images. Login and account-only content are not supported.

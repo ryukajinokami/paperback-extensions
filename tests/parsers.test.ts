@@ -1,3 +1,4 @@
+import { HentaiOriginesParser } from '../src/HentaiOrigines/HentaiOriginesParser'
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import { MangaDistrictParser } from '../src/MangaDistrict/MangaDistrictParser'
@@ -382,4 +383,17 @@ test('Hentai-Scantrad accepts its storage pages and preserves decimal French cha
     'https://stockage.hentai-scantrad.org/manga_example/chapter/1.webp'
   ])
   assert.throws(() => new MangaDistrictParser('https://mangadistrict.com').parseChapterDetails('example', 'bonus', html))
+})
+
+
+test('Hentai Origines uses its own routes and parses public WordPress reader pages', () => {
+  const parser = new HentaiOriginesParser('https://hentai-origines.com')
+  assert.equal(parser.buildSeriesUrl('sample'), 'https://hentai-origines.com/manga/sample/')
+  assert.equal(parser.buildChapterUrl('sample', 'chapitre-2'), 'https://hentai-origines.com/manga/sample/chapitre-2/')
+  assert.match(parser.buildArchiveUrl('modified', 1), /\/catalogue\//)
+  const html = '<div class="reading-content"><img class="wp-manga-chapter-img" data-src=" https://hentai-origines.com/wp-content/uploads/WP-manga/data/sample/001.jpeg "></div>'
+  assert.deepEqual(parser.parseChapterDetails('sample', 'chapitre-2', html).pages, ['https://hentai-origines.com/wp-content/uploads/WP-manga/data/sample/001.jpeg'])
+  const chapters = parser.parseChapters('sample', '<a href="https://hentai-origines.com/manga/sample/chapitre-2/">2</a>')
+  assert.equal(chapters[0]?.chapNum, 2)
+  assert.equal(chapters[0]?.langCode, 'fr')
 })

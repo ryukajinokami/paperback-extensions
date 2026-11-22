@@ -66,6 +66,14 @@
       "websiteBaseURL": "https://hentai-scantrad.org",
       "contentRating": "ADULT",
       "path": "bundles/HentaiScantrad/index.js"
+    },
+    {
+      "id": "HentaiOrigines",
+      "name": "Hentai Origines",
+      "version": "1.0.0",
+      "websiteBaseURL": "https://hentai-origines.com",
+      "contentRating": "ADULT",
+      "path": "bundles/HentaiOrigines/index.js"
     }
   ]
 }

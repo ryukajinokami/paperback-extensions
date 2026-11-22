@@ -50,6 +50,12 @@
       "name": "Hentai-Scantrad",
       "version": "1.0.0",
       "url": "https://<your-github-username>.github.io/<your-repository-name>/HentaiScantrad/index.js"
+    },
+    {
+      "id": "HentaiOrigines",
+      "name": "Hentai Origines",
+      "version": "1.0.0",
+      "url": "https://<your-github-username>.github.io/<your-repository-name>/HentaiOrigines/index.js"
     }
   ]
 }

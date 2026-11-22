@@ -1,3 +1,4 @@
+import { HentaiOrigines } from '../src/HentaiOrigines/HentaiOrigines'
 import { HentaiScantrad } from '../src/HentaiScantrad/HentaiScantrad'
 import { MangaDistrictParser } from '../src/MangaDistrict/MangaDistrictParser'
 import { LelMangaParser } from '../src/LelManga/LelMangaParser'
@@ -12,9 +13,10 @@ const identity = <T>(value: T): T => value
   createRequest: identity,
   createSourceManga: identity,
   createRequestManager: (info: { interceptor: { interceptRequest: (request: any) => Promise<any> } }) => ({
+    getDefaultUserAgent: async () => 'Mozilla/5.0 Paperback integration test',
     schedule: async (request: any) => {
       const intercepted = await info.interceptor.interceptRequest(request)
-      const response = await fetch(intercepted.url, { method: intercepted.method, headers: intercepted.headers, signal: AbortSignal.timeout(20000) })
+      const response = await fetch(intercepted.url, { method: intercepted.method, headers: intercepted.headers, body: intercepted.data, signal: AbortSignal.timeout(20000) })
       return { status: response.status, data: await response.text() }
     }
   }),
@@ -56,6 +58,7 @@ const cases = [
 
 async function main(): Promise<void> {
   await auditHentaiScantrad()
+  await auditHentaiOrigines()
   for (const item of cases) {
     const response = await fetch(item.url, {
       headers: {
@@ -225,4 +228,27 @@ async function auditHentaiScantrad(): Promise<void> {
   const search = await source.getSearchResults({ ...query, title: manga.mangaInfo.titles[0] ?? '' }, undefined)
   if (!search.results.length || !tags.some(section => section.tags.length)) throw new Error(`Hentai-Scantrad: search=${search.results.length}, genres=${tags[0]?.tags.length}`)
   console.log(`Hentai-Scantrad: ${catalogue.results.length} catalogue entries, ${chapters.length} chapters, ${details.pages.length} downloaded reader images`)
+}
+
+async function auditHentaiOrigines(): Promise<void> {
+  const source = new HentaiOrigines()
+  const query = { title: '', includedTags: [], excludedTags: [], parameters: {} }
+  const catalogue = await source.getSearchResults(query, undefined)
+  const mangaId = catalogue.results[0]?.mangaId
+  if (!mangaId) throw new Error('Hentai Origines: empty catalogue')
+  const manga = await source.getMangaDetails(mangaId)
+  const chapters = await source.getChapters(mangaId)
+  const chapter = chapters.at(-1)
+  if (!chapter || !manga.mangaInfo.titles.length) throw new Error('Hentai Origines: empty metadata or chapters')
+  const details = await source.getChapterDetails(mangaId, chapter.id)
+  for (const url of details.pages) {
+    const response = await fetch(url, { headers: { referer: source.getMangaShareUrl(mangaId) }, signal: AbortSignal.timeout(20000) })
+    if (!response.ok || !response.headers.get('content-type')?.startsWith('image/') || (await response.arrayBuffer()).byteLength === 0) {
+      throw new Error(`Hentai Origines: reader image unavailable (HTTP ${response.status})`)
+    }
+  }
+  const tags = await source.getSearchTags()
+  const search = await source.getSearchResults({ ...query, title: manga.mangaInfo.titles[0] ?? '' }, undefined)
+  if (!search.results.length || !tags.some(section => section.tags.length)) throw new Error(`Hentai Origines: search=${search.results.length}, genres=${tags[0]?.tags.length}`)
+  console.log(`Hentai Origines: ${catalogue.results.length} catalogue entries, ${chapters.length} chapters, ${details.pages.length} downloaded reader images`)
 }
